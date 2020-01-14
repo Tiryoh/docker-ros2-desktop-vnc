@@ -46,8 +46,8 @@ jobs:
           ROS_DISTRO: ${{ matrix.ros-distro }}
         run: |
           mkdir -p build_log
-          trivy --exit-code 0 --severity HIGH --no-progress ubuntu:${DISTRO}-${TARGET} | tee ./build_log/trivy_log-HIGH.txt
-          trivy --exit-code 0 --severity CRITICAL --no-progress ubuntu:${DISTRO}-${TARGET} | tee ./build_log/trivy_log-CRITICAL.txt
+          trivy --exit-code 0 --severity HIGH --no-progress $DOCKER_IMAGENAME:$ROS_DISTRO | tee ./build_log/trivy_log-HIGH.txt
+          trivy --exit-code 0 --severity CRITICAL --no-progress $DOCKER_IMAGENAME:$ROS_DISTRO | tee ./build_log/trivy_log-CRITICAL.txt
 
       - uses: actions/upload-artifact@v1
         with:
