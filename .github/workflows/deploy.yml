@@ -30,7 +30,7 @@ jobs:
 
       - name: Build docker image
         run: |
-          docker build -t $DOCKER_USERNAME/$DOCKER_IMAGENAME:$ROS_DISTRO .
+          cd $ROS_DISTRO && docker build -t $DOCKER_USERNAME/$DOCKER_IMAGENAME:$ROS_DISTRO .
         env:
           ROS_DISTRO: ${{ matrix.ros-distro }}
 
