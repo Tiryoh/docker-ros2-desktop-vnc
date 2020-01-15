@@ -1,0 +1,51 @@
+name: Publish to Registry
+on:
+  push:
+    branches:
+      - master
+    paths:
+      - "**/Dockerfile"
+      - ".github/workflows/**"
+  schedule:
+    - cron: "0 2 * * 0" # Weekly on Sundays at 02:00
+
+env:
+  DOCKER_USERNAME: tiryoh
+  DOCKER_IMAGENAME: ros2-desktop-vnc
+
+jobs:
+  skip:
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo "[Skip CI] ${{ contains(github.event.head_commit.message, '[skip ci]') }}"
+
+  build-and-deploy:
+    if: contains(github.event.head_commit.message, '[skip ci]') == false
+    strategy:
+      matrix:
+        ros-distro: [dashing, eloquent]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@master
+
+      - name: Build docker image
+        run: |
+          cd $ROS_DISTRO && docker build -t $DOCKER_USERNAME/$DOCKER_IMAGENAME:$ROS_DISTRO .
+        env:
+          ROS_DISTRO: ${{ matrix.ros-distro }}
+
+      - name: Publish docker image
+        env:
+          ROS_DISTRO: ${{ matrix.ros-distro }}
+          DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
+        run: |
+          echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin > /dev/null 2>&1
+          docker push $DOCKER_USERNAME/$DOCKER_IMAGENAME:$ROS_DISTRO
+
+      - name: Publish docker image as latest
+        if: contains(matrix.ros-distro, 'dashing') == true
+        env:
+          ROS_DISTRO: ${{ matrix.ros-distro }}
+        run: |
+          docker tag $DOCKER_USERNAME/$DOCKER_IMAGENAME:$ROS_DISTRO $DOCKER_USERNAME/$DOCKER_IMAGENAME:latest
+          docker push $DOCKER_USERNAME/$DOCKER_IMAGENAME:latest
