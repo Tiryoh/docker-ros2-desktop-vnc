@@ -41,6 +41,9 @@ jobs:
         run: |
           echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin > /dev/null 2>&1
           docker push $DOCKER_USERNAME/$DOCKER_IMAGENAME:$ROS_DISTRO
+          TIMESTAMP=$(date '+%Y%m%dT%H%M')
+          docker tag $DOCKER_USERNAME/$DOCKER_IMAGENAME:$ROS_DISTRO $DOCKER_USERNAME/$DOCKER_IMAGENAME:$ROS_DISTRO-$TIMESTAMP
+          docker push $DOCKER_USERNAME/$DOCKER_IMAGENAME:$ROS_DISTRO-$TIMESTAMP
 
       - name: Publish docker image as latest
         if: contains(matrix.ros-distro, 'dashing') == true
