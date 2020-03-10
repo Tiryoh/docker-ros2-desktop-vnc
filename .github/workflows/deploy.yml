@@ -58,6 +58,13 @@ jobs:
           docker tag $DOCKER_USERNAME/$DOCKER_IMAGENAME:$DOCKER_TAGNAME $DOCKER_USERNAME/$DOCKER_IMAGENAME:latest
           docker push $DOCKER_USERNAME/$DOCKER_IMAGENAME:latest
 
+      - name: Get Current Job Log URL
+        id: jobs
+        uses: Tiryoh/gha-jobid-action@v0
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          job_name: build-and-deploy (${{ matrix.ros-distro }})
+
       - name: Update GitHub wiki
         env:
           DOCKER_TAGNAME: ${{ matrix.ros-distro }}
@@ -72,9 +79,9 @@ jobs:
           cd wiki
           LINE=$(grep -n "add $DOCKER_TAGNAME msg after this line" Home.md | cut -d ":" -f 1)
           head -n $LINE Home.md > tmp.md
-          echo "* [\`${DOCKER_DIGEST_SHORT}\`](${DOCKER_IMAGE_HISTORY_URL})" | tee -a tmp.md
+          echo "* \`${DOCKER_DIGEST_SHORT}\`" | tee -a tmp.md
           echo "    * uploaded on $(date --iso-8601="minutes")" | tee -a tmp.md
-          echo "        * https://github.com/${GITHUB_REPOSITORY}/commit/${GITHUB_SHA}/checks" | tee -a tmp.md
+          echo "        * ${{ steps.jobs.outputs.html_url }}" | tee -a tmp.md
           echo "    * snapshot" | tee -a tmp.md
           echo "        * [\`${DOCKER_SNAPSHOT}\`](${DOCKER_SNAPSHOT_IMAGE_HISTORY_URL})" | tee -a tmp.md
           tail -n +$(( $LINE+1 )) Home.md >> tmp.md
