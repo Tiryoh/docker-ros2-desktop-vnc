@@ -6,13 +6,14 @@ A Docker image to provide HTML5 VNC interface to access Ubuntu LXDE + ROS2, base
 
 ## Quick Start
 
-Run the docker container and access with port `6080`
+Run the docker container and access with port `6080`.  
+Change the `shm-size` value depending on the situation.
 
 ```
-docker run -p 6080:80 -v /dev/shm:/dev/shm tiryoh/ros2-desktop-vnc:dashing
+docker run -p 6080:80 --shm-size=512m tiryoh/ros2-desktop-vnc:dashing
 ```
 
-Browse http://127.0.0.1:6080/
+Browse http://127.0.0.1:6080/.
 
 ![Image from Gyazo](https://i.gyazo.com/ab43ab3f6dc10b5186416499e49d0bbe.jpg)
 
