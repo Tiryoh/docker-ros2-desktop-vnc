@@ -11,6 +11,9 @@ A Docker image to provide HTML5 VNC interface to access Ubuntu LXDE + ROS2, base
 There are official ROS 2 Docker images provided by OSRF.  
 https://github.com/osrf/docker_images/blob/master/README.md#official-library
 
+このツールの詳細については以下の記事で紹介しています。  
+The details of these tools are written in Japanese on this page.  
+https://memoteki.net/archives/2955
 
 ## Quick Start
 
@@ -25,9 +28,6 @@ Browse http://127.0.0.1:6080/.
 
 ![Image from Gyazo](https://i.gyazo.com/ab43ab3f6dc10b5186416499e49d0bbe.jpg)
 
-このツールの詳細については以下の記事で紹介しています。  
-The details of these tools are written in Japanese on this page.  
-https://memoteki.net/archives/2955
 
 ## Docker tags
 
