@@ -5,7 +5,7 @@ on:
       - master
     paths:
       - "**/Dockerfile"
-      - ".github/workflows/**"
+      - ".github/workflows/test.yml"
   schedule:
     - cron: "0 2 * * 0" # Weekly on Sundays at 02:00
 
@@ -17,7 +17,7 @@ jobs:
   build:
     strategy:
       matrix:
-        ros-distro: [dashing, eloquent]
+        ros-distro: [dashing, eloquent, foxy]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@master
