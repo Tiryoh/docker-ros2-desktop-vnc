@@ -33,6 +33,7 @@ Browse http://127.0.0.1:6080/.
 
 * [`dashing`, `latest`](https://github.com/Tiryoh/docker_ros2-desktop-vnc/blob/master/dashing/Dockerfile)
 * [`eloquent`](https://github.com/Tiryoh/docker_ros2-desktop-vnc/blob/master/eloquent/Dockerfile)
+* [`foxy`](https://github.com/Tiryoh/docker_ros2-desktop-vnc/blob/master/foxy/Dockerfile)
 
 
 Docker tags and build logs are listed on this page.  
