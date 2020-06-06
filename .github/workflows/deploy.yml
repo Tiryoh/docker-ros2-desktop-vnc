@@ -28,7 +28,7 @@ jobs:
         ros-distro: [dashing, eloquent]
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@master
+      - uses: actions/checkout@v2
 
       - name: Build docker image
         env:
@@ -70,6 +70,7 @@ jobs:
           DOCKER_TAGNAME: ${{ matrix.ros-distro }}
           DOCKER_SNAPSHOT: ${{ matrix.ros-distro }}-${{ steps.docker.outputs.timestamp }}
           DOCKER_DIGEST_RAW: ${{ steps.docker.outputs.digest }}
+          TARGET_MD_NAME: ${{ matrix.ros-distro }}
         run: |
           DOCKER_DIGEST=$(echo $DOCKER_DIGEST_RAW | sed -E 's/.*@sha256:(.*)/sha256-\1/g')
           DOCKER_DIGEST_SHORT=$(echo $DOCKER_DIGEST | sed -E 's/.*([0-9a-z]{12})[0-9a-z]{52}$/\1/g')
@@ -77,17 +78,17 @@ jobs:
           DOCKER_SNAPSHOT_IMAGE_HISTORY_URL=$(echo https://hub.docker.com/layers/${DOCKER_USERNAME}/${DOCKER_IMAGENAME}/${DOCKER_SNAPSHOT}/images/${DOCKER_DIGEST})
           git clone --depth=1 https://${GITHUB_ACTOR}:${{ secrets.GITHUB_TOKEN }}@github.com/${GITHUB_REPOSITORY}.wiki.git wiki
           cd wiki
-          LINE=$(grep -n "add $DOCKER_TAGNAME msg after this line" Home.md | cut -d ":" -f 1)
-          head -n $LINE Home.md > tmp.md
+          LINE=$(grep -n "add $DOCKER_TAGNAME msg after this line" ${TARGET_MD_NAME}.md | cut -d ":" -f 1)
+          head -n $LINE ${TARGET_MD_NAME}.md > tmp.md
           echo "* \`${DOCKER_DIGEST_SHORT}\`" | tee -a tmp.md
           echo "    * uploaded on $(date --iso-8601="minutes")" | tee -a tmp.md
           echo "        * ${{ steps.jobs.outputs.html_url }}" | tee -a tmp.md
           echo "    * snapshot" | tee -a tmp.md
           echo "        * [\`${DOCKER_SNAPSHOT}\`](${DOCKER_SNAPSHOT_IMAGE_HISTORY_URL})" | tee -a tmp.md
-          tail -n +$(( $LINE+1 )) Home.md >> tmp.md
-          mv tmp.md Home.md
+          tail -n +$(( $LINE+1 )) ${TARGET_MD_NAME}.md >> tmp.md
+          mv tmp.md ${TARGET_MD_NAME}.md
           git config --local user.email "${GIT_CONFIG_EMAIL}"
           git config --local user.name "${GIT_CONFIG_USER}"
-          git add Home.md
-          git commit -m "Update Home.md"
+          git add ${TARGET_MD_NAME}.md
+          git commit -m "Update ${TARGET_MD_NAME}.md"
           git push origin master
