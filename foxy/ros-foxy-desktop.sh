@@ -19,7 +19,7 @@ sudo apt-get install -y ros-${CHOOSE_ROS_DISTRO}-${INSTALL_PACKAGE}
 sudo apt-get install -y python3-argcomplete
 sudo apt-get install -y python3-colcon-common-extensions
 sudo apt-get install -y python3-rosdep python3-vcstool # https://index.ros.org/doc/ros2/Installation/Linux-Development-Setup/
-sudo apt-get install -y gazebo11 # gazebo-ros-pkgs is not ready for foxy on June 6th, 2020 https://github.com/ros-simulation/gazebo_ros_pkgs/issues/1080
+sudo apt-get install -y ros-${CHOOSE_ROS_DISTRO}-gazebo-ros-pkgs
 grep -F "source /opt/ros/${CHOOSE_ROS_DISTRO}/setup.bash" ~/.bashrc ||
 echo "source /opt/ros/${CHOOSE_ROS_DISTRO}/setup.bash" >> ~/.bashrc
 
