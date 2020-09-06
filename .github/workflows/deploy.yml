@@ -46,7 +46,7 @@ jobs:
           # ghcr.io
           echo ${{ secrets.GITHUB_TOKEN }} | docker login https://docker.pkg.github.com -u $GITHUB_ACTOR --password-stdin > /dev/null 2>&1
           docker tag $DOCKER_USERNAME/$DOCKER_IMAGENAME:$DOCKER_TAGNAME ghcr.io/$GITHUB_ACTOR/$DOCKER_IMAGENAME:$DOCKER_TAGNAME
-          docker tag $DOCKER_USERNAME/$DOCKER_IMAGENAME:$DOCKER_TAGNAME ghcr.io/$GITHUB_ACTOR/$DOCKER_IMAGENAME/$DOCKER_TAGNAME:$TIMESTAMP
+          docker tag $DOCKER_USERNAME/$DOCKER_IMAGENAME:$DOCKER_TAGNAME ghcr.io/$GITHUB_ACTOR/$DOCKER_IMAGENAME:$DOCKER_TAGNAME-$TIMESTAMP
           docker push ghcr.io/$GITHUB_ACTOR/$DOCKER_IMAGENAME:$DOCKER_TAGNAME
           docker push ghcr.io/$GITHUB_ACTOR/$DOCKER_IMAGENAME/$DOCKER_TAGNAME:$TIMESTAMP
           # docker.io
