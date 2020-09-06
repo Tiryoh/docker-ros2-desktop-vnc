@@ -40,14 +40,20 @@ jobs:
       - name: Publish docker image
         env:
           DOCKER_TAGNAME: ${{ matrix.ros-distro }}
-          DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
         id: docker
         run: |
-          echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin > /dev/null 2>&1
-          docker push $DOCKER_USERNAME/$DOCKER_IMAGENAME:$DOCKER_TAGNAME
           TIMESTAMP=$(date '+%Y%m%dT%H%M')
+          # docker.io
+          echo ${{ secrets.DOCKER_PASSWORD }} | docker login -u "$DOCKER_USERNAME" --password-stdin > /dev/null 2>&1
+          docker push $DOCKER_USERNAME/$DOCKER_IMAGENAME:$DOCKER_TAGNAME
           docker tag $DOCKER_USERNAME/$DOCKER_IMAGENAME:$DOCKER_TAGNAME $DOCKER_USERNAME/$DOCKER_IMAGENAME:$DOCKER_TAGNAME-$TIMESTAMP
           docker push $DOCKER_USERNAME/$DOCKER_IMAGENAME:$DOCKER_TAGNAME-$TIMESTAMP
+          # ghcr.io
+          echo ${{ secrets.GITHUB_TOKEN }} | docker login https://docker.pkg.github.com -u $GITHUB_ACTOR --password-stdin > /dev/null 2>&1
+          docker tag $DOCKER_USERNAME/$DOCKER_IMAGENAME:$DOCKER_TAGNAME ghcr.io/$GITHUB_ACTOR/$DOCKER_IMAGENAME:$DOCKER_TAGNAME
+          docker tag $DOCKER_USERNAME/$DOCKER_IMAGENAME:$DOCKER_TAGNAME ghcr.io/$GITHUB_ACTOR/$DOCKER_IMAGENAME/$DOCKER_TAGNAME:$TIMESTAMP
+          docker push ghcr.io/$GITHUB_ACTOR/$DOCKER_IMAGENAME:$DOCKER_TAGNAME
+          docker push ghcr.io/$GITHUB_ACTOR/$DOCKER_IMAGENAME/$DOCKER_TAGNAME:$TIMESTAMP
           echo ::set-output name=timestamp::$TIMESTAMP
           echo ::set-output name=digest::$(docker inspect --format='{{index .RepoDigests 0}}' $DOCKER_USERNAME/$DOCKER_IMAGENAME:$DOCKER_TAGNAME-$TIMESTAMP)
 
