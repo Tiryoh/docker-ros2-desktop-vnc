@@ -1,10 +1,10 @@
-# docker_ros2-desktop-vnc
+# docker-ros2-desktop-vnc
 
 ![Docker Automated build](https://img.shields.io/docker/automated/tiryoh/ros2-desktop-vnc)
-[![Publish to Registry](https://github.com/Tiryoh/docker_ros2-desktop-vnc/workflows/Publish%20to%20Registry/badge.svg?branch=master)](https://github.com/Tiryoh/docker_ros2-desktop-vnc/actions?query=workflow%3A%22Publish+to+Registry%22+branch%3Amaster)
+[![Publish to Registry](https://github.com/Tiryoh/docker-ros2-desktop-vnc/workflows/Publish%20to%20Registry/badge.svg?branch=master)](https://github.com/Tiryoh/docker-ros2-desktop-vnc/actions?query=workflow%3A%22Publish+to+Registry%22+branch%3Amaster)
 [![](https://img.shields.io/docker/pulls/tiryoh/ros2-desktop-vnc.svg)](https://hub.docker.com/r/tiryoh/ros2-desktop-vnc)
 
-A Docker image to provide HTML5 VNC interface to access Ubuntu LXDE + ROS2, based on [dorowu/ubuntu-desktop-lxde-vnc](https://github.com/fcwu/docker-ubuntu-vnc-desktop)
+Dockerfiles to provide HTML5 VNC interface to access Ubuntu LXDE + ROS2, based on [dorowu/ubuntu-desktop-lxde-vnc](https://github.com/fcwu/docker-ubuntu-vnc-desktop)
 
 ![Image from Gyazo](https://i.gyazo.com/5a71a36dc9d6106ef794fbcb86af7e7f.gif)
 
@@ -28,16 +28,33 @@ Browse http://127.0.0.1:6080/.
 
 ![Image from Gyazo](https://i.gyazo.com/ab43ab3f6dc10b5186416499e49d0bbe.jpg)
 
+## Build
 
-## Docker tags
+To build Docker image from this Dockerfile, run the following command.
 
-* [`dashing`, `latest`](https://github.com/Tiryoh/docker_ros2-desktop-vnc/blob/master/dashing/Dockerfile)
-* [`eloquent`](https://github.com/Tiryoh/docker_ros2-desktop-vnc/blob/master/eloquent/Dockerfile)
-* [`foxy`](https://github.com/Tiryoh/docker_ros2-desktop-vnc/blob/master/foxy/Dockerfile)
+* dashing
+```
+cd dashing && docker build -t tiryoh/ros2-desktop-vnc:dashing .
+```
 
+* eloquent
+```
+cd eloquent && docker build -t tiryoh/ros2-desktop-vnc:eloquent .
+```
+
+* foxy
+```
+cd foxy && docker build -t tiryoh/ros2-desktop-vnc:foxy .
+```
+
+## Docker tags on hub.docker.com
+
+* [`dashing`](https://hub.docker.com/r/tiryoh/ros2-desktop-vnc/tags?page=1&name=dashing), [`latest`](https://hub.docker.com/r/tiryoh/ros2-desktop-vnc/tags?page=1&name=latest) which is based on [`dashing/Dockerfile`](./dashing/Dockerfile)
+* [`eloquent`](https://hub.docker.com/r/tiryoh/ros2-desktop-vnc/tags?page=1&name=eloquent) which is based on [`eloquent/Dockerfile`](./eloquent/Dockerfile)
+* [`foxy`](https://hub.docker.com/r/tiryoh/ros2-desktop-vnc/tags?page=1&name=foxy) which is based on [`foxy/Dockerfile`](./eloquent/Dockerfile)
 
 Docker tags and build logs are listed on this page.  
-https://github.com/Tiryoh/docker_ros2-desktop-vnc/wiki
+https://github.com/Tiryoh/docker-ros2-desktop-vnc/wiki
 
 ## License
 
@@ -48,4 +65,4 @@ Unless attributed otherwise, everything in this repository is under the Apache L
 
 ### Acknowledgements
 
-This Docker image is based on [dorowu/ubuntu-desktop-lxde-vnc](https://github.com/fcwu/docker-ubuntu-vnc-desktop), licensed under the [Apache License 2.0](https://github.com/fcwu/docker-ubuntu-vnc-desktop/blob/60f9ae18e71e9fabbfb23f67b212e64ab72c206e/LICENSE).
+This Dockerfile is based on [dorowu/ubuntu-desktop-lxde-vnc](https://github.com/fcwu/docker-ubuntu-vnc-desktop), licensed under the [Apache License 2.0](https://github.com/fcwu/docker-ubuntu-vnc-desktop/blob/60f9ae18e71e9fabbfb23f67b212e64ab72c206e/LICENSE).
