@@ -8,7 +8,7 @@ Dockerfiles to provide HTML5 VNC interface to access Ubuntu LXDE + ROS2, based o
 
 ![Image from Gyazo](https://i.gyazo.com/5a71a36dc9d6106ef794fbcb86af7e7f.gif)
 
-There are official ROS 2 Docker images provided by OSRF.  
+There are official ROS 2 Docker images provided by Open Robotics.  
 https://github.com/osrf/docker_images/blob/master/README.md#official-library
 
 このツールの詳細については以下の記事で紹介しています。  
