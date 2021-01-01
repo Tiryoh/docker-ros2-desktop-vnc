@@ -18,7 +18,7 @@ jobs:
   build:
     strategy:
       matrix:
-        ros-distro: [dashing, eloquent, foxy]
+        ros-distro: [dashing, foxy]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@master
