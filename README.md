@@ -21,7 +21,7 @@ Run the docker container and access with port `6080`.
 Change the `shm-size` value depending on the situation.
 
 ```
-docker run -p 6080:80 --shm-size=512m tiryoh/ros2-desktop-vnc:dashing
+docker run -p 6080:80 --shm-size=512m tiryoh/ros2-desktop-vnc:foxy
 ```
 
 Browse http://127.0.0.1:6080/.
