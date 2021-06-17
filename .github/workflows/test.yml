@@ -18,7 +18,7 @@ jobs:
   build:
     strategy:
       matrix:
-        ros-distro: [dashing, foxy, foxy-arm64]
+        ros-distro: [dashing, foxy, foxy-arm64, galactic]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
@@ -52,7 +52,7 @@ jobs:
           trivy --exit-code 0 --severity HIGH --no-progress $DOCKER_USERNAME/$DOCKER_IMAGENAME:$ROS_DISTRO | tee ./build_log/trivy_log-HIGH.txt
           trivy --exit-code 0 --severity CRITICAL --no-progress $DOCKER_USERNAME/$DOCKER_IMAGENAME:$ROS_DISTRO | tee ./build_log/trivy_log-CRITICAL.txt
 
-      - uses: actions/upload-artifact@v1
+      - uses: actions/upload-artifact@v2
         with:
           name: build_log-${{ matrix.ros-distro }}
           path: build_log
