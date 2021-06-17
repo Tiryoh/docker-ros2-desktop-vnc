@@ -7,7 +7,7 @@ set -eu
 # by Open Robotics, licensed under CC-BY-4.0
 # source: https://github.com/ros2/ros2_documentation
 
-CHOOSE_ROS_DISTRO=foxy
+CHOOSE_ROS_DISTRO=galactic
 INSTALL_PACKAGE=desktop
 
 sudo apt-get update
