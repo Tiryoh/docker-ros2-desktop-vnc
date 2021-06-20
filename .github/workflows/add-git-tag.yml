@@ -1,0 +1,20 @@
+name: Add git tag
+on:
+  pull_request:
+    types: [closed]
+jobs:
+  release-candidate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: checkout
+        uses: actions/checkout@v2
+      - name: Add tag
+        if: startsWith(github.event.pull_request.title, 'release') && github.event.pull_request.merged == true
+        env:
+          PR_TITLE: ${{ github.event.pull_request.title }}
+        run: |
+          echo $PR_TITLE | grep -e "release.*" || exit 1
+          git remote set-url origin https://${GITHUB_ACTOR}:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git
+          git tag $(echo $PR_TITLE | sed -E 's/.* (v[0-9\-\.]*)/\1/g')
+          git tag -l
+          git push origin --tags
