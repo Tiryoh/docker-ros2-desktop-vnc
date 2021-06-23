@@ -20,7 +20,7 @@ jobs:
   build-and-deploy:
     strategy:
       matrix:
-        ros-distro: [dashing, foxy, foxy-arm64, galactic]
+        ros-distro: [dashing, dashing-arm64, foxy, foxy-arm64, galactic]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
