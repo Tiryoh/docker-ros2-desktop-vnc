@@ -2,6 +2,20 @@
 ## [Unreleased]
 
 
+<a name="v1.2.0"></a>
+## [v1.2.0] - 2021-06-27
+### CI
+- Add ROS 2 Galactic ([#30](https://github.com/Tiryoh/docker-ros2-desktop-vnc/issues/30))
+
+### Chore
+- Add documentation update to CHANGELOG ([#32](https://github.com/Tiryoh/docker-ros2-desktop-vnc/issues/32))
+
+### Features
+- Drop ROS 2 Dashing support ([#31](https://github.com/Tiryoh/docker-ros2-desktop-vnc/issues/31))
+- Add Dockerfile for dashing-arm64 to support Apple Silicon ([#20](https://github.com/Tiryoh/docker-ros2-desktop-vnc/issues/20))
+- Set foxy as the "latest" image ([#22](https://github.com/Tiryoh/docker-ros2-desktop-vnc/issues/22))
+
+
 <a name="v1.1.0"></a>
 ## [v1.1.0] - 2021-06-15
 ## Documentation
@@ -49,5 +63,6 @@
 - Fix dashing tag image ([#14](https://github.com/Tiryoh/docker-ros2-desktop-vnc/issues/14))
 
 
-[Unreleased]: https://github.com/Tiryoh/docker-ros2-desktop-vnc/compare/v1.1.0...HEAD
+[Unreleased]: https://github.com/Tiryoh/docker-ros2-desktop-vnc/compare/v1.2.0...HEAD
+[v1.2.0]: https://github.com/Tiryoh/docker-ros2-desktop-vnc/compare/v1.1.0...v1.2.0
 [v1.1.0]: https://github.com/Tiryoh/docker-ros2-desktop-vnc/compare/v1.0.0...v1.1.0
