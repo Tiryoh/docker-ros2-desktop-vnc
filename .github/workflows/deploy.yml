@@ -20,7 +20,7 @@ jobs:
   build-and-deploy:
     strategy:
       matrix:
-        ros-distro: [foxy, foxy-arm64, galactic]
+        ros-distro: [foxy, foxy-arm64, galactic, galactic-arm64]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
