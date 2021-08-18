@@ -3,7 +3,7 @@
 
 
 <a name="v1.2.0"></a>
-## [v1.2.0] - 2021-07-01
+## [v1.2.0] - 2021-08-18
 ### CI
 - Add ROS 2 Galactic ([#30](https://github.com/Tiryoh/docker-ros2-desktop-vnc/issues/30))
 
