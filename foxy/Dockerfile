@@ -3,7 +3,7 @@ LABEL maintainer="Tiryoh<tiryoh@gmail.com>"
 
 ENV DEBIAN_FRONTEND noninteractive
 RUN echo "Set disable_coredump false" >> /etc/sudo.conf
-RUN apt-get update -q && \
+RUN apt-get update --fix-missing -q && \
     apt-get upgrade -yq && \
     apt-get install -yq wget curl git build-essential vim sudo lsb-release locales bash-completion tzdata gosu && \
     rm -rf /var/lib/apt/lists/*
