@@ -6,6 +6,8 @@
 
 Dockerfiles to provide HTML5 VNC interface to access Ubuntu LXDE + ROS2, based on [dorowu/ubuntu-desktop-lxde-vnc](https://github.com/fcwu/docker-ubuntu-vnc-desktop)
 
+ROS 1 version: https://github.com/Tiryoh/docker-ros-desktop-vnc
+
 ![Image from Gyazo](https://i.gyazo.com/5a71a36dc9d6106ef794fbcb86af7e7f.gif)
 
 There are official ROS 2 Docker images provided by Open Robotics.  
