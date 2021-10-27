@@ -33,6 +33,19 @@ jobs:
         run: |
           cd $DOCKER_TAGNAME && docker build -t $DOCKER_USERNAME/$DOCKER_IMAGENAME:$DOCKER_TAGNAME .
 
+      - name: Login to ghcr.io
+        uses: docker/login-action@v1
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Login to docker.io
+        uses: docker/login-action@v1
+        with:
+          username: ${{ env.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
       - name: Publish docker image
         env:
           DOCKER_TAGNAME: ${{ matrix.ros-distro }}
@@ -40,13 +53,11 @@ jobs:
         run: |
           TIMESTAMP=$(date '+%Y%m%dT%H%M')
           # ghcr.io
-          echo ${{ secrets.CR_PAT }} | docker login ghcr.io -u $DOCKER_USERNAME --password-stdin > /dev/null 2>&1
           docker tag $DOCKER_USERNAME/$DOCKER_IMAGENAME:$DOCKER_TAGNAME ghcr.io/$DOCKER_USERNAME/$DOCKER_IMAGENAME:$DOCKER_TAGNAME
           docker tag $DOCKER_USERNAME/$DOCKER_IMAGENAME:$DOCKER_TAGNAME ghcr.io/$DOCKER_USERNAME/$DOCKER_IMAGENAME:$DOCKER_TAGNAME-$TIMESTAMP
           docker push ghcr.io/$DOCKER_USERNAME/$DOCKER_IMAGENAME:$DOCKER_TAGNAME
           docker push ghcr.io/$DOCKER_USERNAME/$DOCKER_IMAGENAME:$DOCKER_TAGNAME-$TIMESTAMP
           # docker.io
-          echo ${{ secrets.DOCKER_PASSWORD }} | docker login -u "$DOCKER_USERNAME" --password-stdin > /dev/null 2>&1
           docker push $DOCKER_USERNAME/$DOCKER_IMAGENAME:$DOCKER_TAGNAME
           docker tag $DOCKER_USERNAME/$DOCKER_IMAGENAME:$DOCKER_TAGNAME $DOCKER_USERNAME/$DOCKER_IMAGENAME:$DOCKER_TAGNAME-$TIMESTAMP
           docker push $DOCKER_USERNAME/$DOCKER_IMAGENAME:$DOCKER_TAGNAME-$TIMESTAMP
