@@ -2,6 +2,19 @@
 ## [Unreleased]
 
 
+<a name="v1.3.0"></a>
+## [v1.3.0] - 2022-01-09
+### CI
+- Create multi-architecture image ([#38](https://github.com/Tiryoh/docker-ros2-desktop-vnc/issues/38))
+- Simplify authentication ([#36](https://github.com/Tiryoh/docker-ros2-desktop-vnc/issues/36))
+
+### Documentation
+- Add link to ros-desktop-vnc
+
+### Features
+- Add Dockerfile for galactic-arm64 to support Apple Silicon ([#35](https://github.com/Tiryoh/docker-ros2-desktop-vnc/issues/35))
+
+
 <a name="v1.2.0"></a>
 ## [v1.2.0] - 2021-08-18
 ### CI
@@ -17,8 +30,8 @@
 
 
 <a name="v1.1.0"></a>
-## [v1.1.0] - 2021-06-15
-## Documentation
+## [v1.1.0] - 2021-06-18
+### Documentation
 - Fix the link to Foxy's Dockerfile ([#28](https://github.com/Tiryoh/docker-ros2-desktop-vnc/issues/28))
 
 ### Features
@@ -27,7 +40,7 @@
 
 
 <a name="v1.0.0"></a>
-## v1.0.0 - 2021-04-26
+## v1.0.0 - 2021-05-27
 ### CI
 - Add git tag release actions ([#24](https://github.com/Tiryoh/docker-ros2-desktop-vnc/issues/24))
 - Use official skip [skip ci]
@@ -63,6 +76,7 @@
 - Fix dashing tag image ([#14](https://github.com/Tiryoh/docker-ros2-desktop-vnc/issues/14))
 
 
-[Unreleased]: https://github.com/Tiryoh/docker-ros2-desktop-vnc/compare/v1.2.0...HEAD
+[Unreleased]: https://github.com/Tiryoh/docker-ros2-desktop-vnc/compare/v1.3.0...HEAD
+[v1.3.0]: https://github.com/Tiryoh/docker-ros2-desktop-vnc/compare/v1.2.0...v1.3.0
 [v1.2.0]: https://github.com/Tiryoh/docker-ros2-desktop-vnc/compare/v1.1.0...v1.2.0
 [v1.1.0]: https://github.com/Tiryoh/docker-ros2-desktop-vnc/compare/v1.0.0...v1.1.0
