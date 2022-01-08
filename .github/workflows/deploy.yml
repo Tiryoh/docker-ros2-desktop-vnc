@@ -20,7 +20,7 @@ jobs:
   build-and-deploy:
     strategy:
       matrix:
-        ros-distro: [foxy, foxy-arm64, galactic, galactic-arm64]
+        ros-distro: [foxy-amd64, foxy-arm64, galactic-amd64, galactic-arm64]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
@@ -31,7 +31,7 @@ jobs:
         env:
           DOCKER_TAGNAME: ${{ matrix.ros-distro }}
         run: |
-          cd $DOCKER_TAGNAME && docker build -t $DOCKER_USERNAME/$DOCKER_IMAGENAME:$DOCKER_TAGNAME .
+          cd ${DOCKER_TAGNAME%-amd64} && docker build -t $DOCKER_USERNAME/$DOCKER_IMAGENAME:$DOCKER_TAGNAME .
 
       - name: Login to ghcr.io
         uses: docker/login-action@v1
@@ -55,22 +55,18 @@ jobs:
           # ghcr.io
           docker tag $DOCKER_USERNAME/$DOCKER_IMAGENAME:$DOCKER_TAGNAME ghcr.io/$DOCKER_USERNAME/$DOCKER_IMAGENAME:$DOCKER_TAGNAME
           docker tag $DOCKER_USERNAME/$DOCKER_IMAGENAME:$DOCKER_TAGNAME ghcr.io/$DOCKER_USERNAME/$DOCKER_IMAGENAME:$DOCKER_TAGNAME-$TIMESTAMP
+          docker tag $DOCKER_USERNAME/$DOCKER_IMAGENAME:$DOCKER_TAGNAME ghcr.io/$DOCKER_USERNAME/$DOCKER_IMAGENAME:${DOCKER_TAGNAME%-amd64}-$TIMESTAMP
           docker push ghcr.io/$DOCKER_USERNAME/$DOCKER_IMAGENAME:$DOCKER_TAGNAME
           docker push ghcr.io/$DOCKER_USERNAME/$DOCKER_IMAGENAME:$DOCKER_TAGNAME-$TIMESTAMP
+          docker push ghcr.io/$DOCKER_USERNAME/$DOCKER_IMAGENAME:${DOCKER_TAGNAME%-amd64}-$TIMESTAMP
           # docker.io
           docker push $DOCKER_USERNAME/$DOCKER_IMAGENAME:$DOCKER_TAGNAME
           docker tag $DOCKER_USERNAME/$DOCKER_IMAGENAME:$DOCKER_TAGNAME $DOCKER_USERNAME/$DOCKER_IMAGENAME:$DOCKER_TAGNAME-$TIMESTAMP
           docker push $DOCKER_USERNAME/$DOCKER_IMAGENAME:$DOCKER_TAGNAME-$TIMESTAMP
+          docker tag $DOCKER_USERNAME/$DOCKER_IMAGENAME:$DOCKER_TAGNAME $DOCKER_USERNAME/$DOCKER_IMAGENAME:${DOCKER_TAGNAME%-amd64}-$TIMESTAMP
+          docker push $DOCKER_USERNAME/$DOCKER_IMAGENAME:${DOCKER_TAGNAME%-amd64}-$TIMESTAMP
           echo ::set-output name=timestamp::$TIMESTAMP
           echo ::set-output name=digest::$(docker inspect --format='{{index .RepoDigests 0}}' $DOCKER_USERNAME/$DOCKER_IMAGENAME:$DOCKER_TAGNAME-$TIMESTAMP)
-
-      - name: Publish docker image as latest
-        if: contains(matrix.ros-distro, 'foxy') == true
-        env:
-          DOCKER_TAGNAME: ${{ matrix.ros-distro }}
-        run: |
-          docker tag $DOCKER_USERNAME/$DOCKER_IMAGENAME:$DOCKER_TAGNAME $DOCKER_USERNAME/$DOCKER_IMAGENAME:latest
-          docker push $DOCKER_USERNAME/$DOCKER_IMAGENAME:latest
 
       - name: Get Current Job Log URL
         id: jobs
@@ -105,4 +101,64 @@ jobs:
           git config --local user.name "${GIT_CONFIG_USER}"
           git add ${TARGET_MD_NAME}.md
           git commit -m "Update ${TARGET_MD_NAME}.md"
-          git push origin master
+          git fetch origin && git merge origin/master --no-edit && git push origin master
+
+  upload:
+    needs: [build-and-deploy]
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        ros-distro: [foxy, galactic]
+    steps:
+      - name: Prepare Docker
+        run: |	
+          mkdir -p ~/.docker	
+          grep -q '{' ~/.docker/config.json || echo '{}' | tee ~/.docker/config.json > /dev/null	
+          jq '. |= .+ {"experimental": "enabled"}' ~/.docker/config.json > ~/docker-config.json && mv ~/docker-config.json ~/.docker/config.json
+          sudo service docker restart
+
+      - name: Login to ghcr.io
+        uses: docker/login-action@v1
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Login to docker.io
+        uses: docker/login-action@v1
+        with:
+          username: ${{ env.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Prepare Docker Image
+        env:
+          ROS_DISTRO: ${{ matrix.ros-distro }}
+        run: |
+          docker pull ghcr.io/${DOCKER_USERNAME}/${DOCKER_IMAGENAME}:${ROS_DISTRO}-amd64
+          docker pull ghcr.io/${DOCKER_USERNAME}/${DOCKER_IMAGENAME}:${ROS_DISTRO}-arm64
+          docker pull ${DOCKER_USERNAME}/${DOCKER_IMAGENAME}:${ROS_DISTRO}-amd64
+          docker pull ${DOCKER_USERNAME}/${DOCKER_IMAGENAME}:${ROS_DISTRO}-arm64
+
+      - name: Publish Docker Image
+        env:
+          ROS_DISTRO: ${{ matrix.ros-distro }}
+        run: |
+          docker manifest create --amend ${DOCKER_USERNAME}/${DOCKER_IMAGENAME}:${ROS_DISTRO} ${DOCKER_USERNAME}/${DOCKER_IMAGENAME}:${ROS_DISTRO}-amd64 ${DOCKER_USERNAME}/${DOCKER_IMAGENAME}:${ROS_DISTRO}-arm64
+          docker manifest annotate ${DOCKER_USERNAME}/${DOCKER_IMAGENAME}:${ROS_DISTRO} ${DOCKER_USERNAME}/${DOCKER_IMAGENAME}:${ROS_DISTRO}-arm64 --arch arm64 
+          docker manifest push ${DOCKER_USERNAME}/${DOCKER_IMAGENAME}:${ROS_DISTRO}
+          docker manifest create --amend ghcr.io/${DOCKER_USERNAME}/${DOCKER_IMAGENAME}:${ROS_DISTRO} ghcr.io/${DOCKER_USERNAME}/${DOCKER_IMAGENAME}:${ROS_DISTRO}-amd64 ghcr.io/${DOCKER_USERNAME}/${DOCKER_IMAGENAME}:${ROS_DISTRO}-arm64
+          docker manifest annotate ghcr.io/${DOCKER_USERNAME}/${DOCKER_IMAGENAME}:${ROS_DISTRO} ghcr.io/${DOCKER_USERNAME}/${DOCKER_IMAGENAME}:${ROS_DISTRO}-arm64 --arch arm64 
+          docker manifest push ghcr.io/${DOCKER_USERNAME}/${DOCKER_IMAGENAME}:${ROS_DISTRO}
+
+      - name: Publish Docker Image as latest
+        if: contains(matrix.ros-distro, 'foxy') == true
+        env:
+          ROS_DISTRO: ${{ matrix.ros-distro }}
+        run: |
+          docker manifest create --amend ${DOCKER_USERNAME}/${DOCKER_IMAGENAME}:latest ${DOCKER_USERNAME}/${DOCKER_IMAGENAME}:${ROS_DISTRO}-amd64 ${DOCKER_USERNAME}/${DOCKER_IMAGENAME}:${ROS_DISTRO}-arm64
+          docker manifest annotate ${DOCKER_USERNAME}/${DOCKER_IMAGENAME}:latest ${DOCKER_USERNAME}/${DOCKER_IMAGENAME}:${ROS_DISTRO}-arm64 --arch arm64 
+          docker manifest push ${DOCKER_USERNAME}/${DOCKER_IMAGENAME}:latest
+          docker manifest create --amend ghcr.io/${DOCKER_USERNAME}/${DOCKER_IMAGENAME}:latest ghcr.io/${DOCKER_USERNAME}/${DOCKER_IMAGENAME}:${ROS_DISTRO}-amd64 ghcr.io/${DOCKER_USERNAME}/${DOCKER_IMAGENAME}:${ROS_DISTRO}-arm64
+          docker manifest annotate ghcr.io/${DOCKER_USERNAME}/${DOCKER_IMAGENAME}:latest ghcr.io/${DOCKER_USERNAME}/${DOCKER_IMAGENAME}:${ROS_DISTRO}-arm64 --arch arm64 
+          docker manifest push ghcr.io/${DOCKER_USERNAME}/${DOCKER_IMAGENAME}:latest
