@@ -1,6 +1,6 @@
 name: Publish to Registry
 on:
-  push:
+  pull_request:
     branches:
       - master
     paths:
