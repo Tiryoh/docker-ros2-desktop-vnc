@@ -27,11 +27,35 @@ jobs:
 
       - uses: docker/setup-qemu-action@v1
 
+      - name: Prepare Docker metadata
+        id: meta
+        uses: docker/metadata-action@v3
+        with:
+          images: |
+            ${{ env.DOCKER_USERNAME }}/${{ env.DOCKER_IMAGENAME }}
+          tags: |
+            type=raw,value=${{ matrix.ros-distro }}-{{date 'YYYYMMDDTHHmm'}}
+            type=raw,value=${{ matrix.ros-distro }}
+          flavor: |
+            latest=false
+            prefix=
+            suffix=
+
+      - name: Parse docker build option
+        id: docker-build-option
+        run: |
+          LABELS=$(cat << EOF | grep -E "=." | sed -e "s/org\./--label org./g"
+          ${{ steps.meta.outputs.labels }}
+          EOF
+          )
+          echo $LABELS
+          echo ::set-output name=labels::$LABELS
+
       - name: Build docker image
         env:
           DOCKER_TAGNAME: ${{ matrix.ros-distro }}
         run: |
-          cd ${DOCKER_TAGNAME%-amd64} && docker build -t $DOCKER_USERNAME/$DOCKER_IMAGENAME:$DOCKER_TAGNAME .
+          cd ${DOCKER_TAGNAME%-amd64} && docker build ${{ steps.docker-build-option.outputs.labels }} -t $DOCKER_USERNAME/$DOCKER_IMAGENAME:$DOCKER_TAGNAME .
 
       - name: Login to ghcr.io
         uses: docker/login-action@v1
