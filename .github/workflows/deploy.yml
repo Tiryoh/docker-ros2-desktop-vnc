@@ -44,7 +44,7 @@ jobs:
       - name: Parse docker build option
         id: docker-build-option
         run: |
-          LABELS=$(cat << EOF | grep -E "=." | sed -e "s/org\./--label org./g"
+          LABELS=$(cat << EOF | grep -E "=." | sed -e "s/org\./--label org./g" | sed -e "s/--label org\(.*\)=\(.*\)$/--label org\1='\2'/g"
           ${{ steps.meta.outputs.labels }}
           EOF
           )
