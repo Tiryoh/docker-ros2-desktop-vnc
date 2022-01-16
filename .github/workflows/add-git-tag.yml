@@ -5,11 +5,18 @@ on:
 jobs:
   release-candidate:
     runs-on: ubuntu-latest
+    if: startsWith(github.event.pull_request.title, 'release')
     steps:
       - name: checkout
         uses: actions/checkout@v2
+      - name: Check CHANGELOG
+        run: |
+          if [[ $(grep "${{ steps.release.outputs.version }}" CHANGELOG.md) == "" ]]; then
+            echo "VERSION MISMATCH"
+            exit 1
+          fi
       - name: Add tag
-        if: startsWith(github.event.pull_request.title, 'release') && github.event.pull_request.merged == true
+        if: github.event.pull_request.merged == true
         env:
           PR_TITLE: ${{ github.event.pull_request.title }}
         run: |
