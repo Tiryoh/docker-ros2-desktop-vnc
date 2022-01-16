@@ -125,6 +125,7 @@ jobs:
           git config --local user.name "${GIT_CONFIG_USER}"
           git add ${TARGET_MD_NAME}.md
           git commit -m "Update ${TARGET_MD_NAME}.md"
+          git fetch origin && git merge origin/master --no-edit && git push origin master || \
           git fetch origin && git merge origin/master --no-edit && git push origin master
 
   upload:
