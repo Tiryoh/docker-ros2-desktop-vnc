@@ -1,17 +1,51 @@
+# Copyright 2020-2022 Tiryoh<tiryoh@gmail.com>
+# 
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+# 
+#     http://www.apache.org/licenses/LICENSE-2.0
+# 
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
 FROM dorowu/ubuntu-desktop-lxde-vnc:focal
 LABEL maintainer="Tiryoh<tiryoh@gmail.com>"
 
-ENV DEBIAN_FRONTEND noninteractive
 RUN echo "Set disable_coredump false" >> /etc/sudo.conf
 RUN apt-get update -q && \
     apt-get upgrade -yq && \
-    apt-get install -yq wget curl git build-essential vim sudo lsb-release locales bash-completion tzdata gosu && \
+    DEBIAN_FRONTEND=noninteractive apt-get install -yq wget curl git build-essential vim sudo lsb-release locales bash-completion tzdata gosu && \
     rm -rf /var/lib/apt/lists/*
 RUN useradd --create-home --home-dir /home/ubuntu --shell /bin/bash --user-group --groups adm,sudo ubuntu && \
     echo ubuntu:ubuntu | chpasswd && \
     echo "ubuntu ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers
-COPY ./ros-foxy-desktop.sh /ros-foxy-desktop.sh
-RUN mkdir -p /tmp/ros_setup_scripts_ubuntu && mv /ros-foxy-desktop.sh /tmp/ros_setup_scripts_ubuntu/ && \
-    gosu ubuntu /tmp/ros_setup_scripts_ubuntu/ros-foxy-desktop.sh && \
+
+ARG ROS_DISTRO=foxy
+ARG INSTALL_PACKAGE=desktop
+
+RUN apt-get update -q && \
+    apt-get install -y curl gnupg2 lsb-release && \
+    curl -sSL https://raw.githubusercontent.com/ros/rosdistro/master/ros.key -o /usr/share/keyrings/ros-archive-keyring.gpg && \
+    echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/ros-archive-keyring.gpg] http://packages.ros.org/ros2/ubuntu $(lsb_release -cs) main" | tee /etc/apt/sources.list.d/ros2.list > /dev/null && \
+    apt-get update -q && \
+    apt-get install -y ros-${ROS_DISTRO}-${INSTALL_PACKAGE} \
+    python3-argcomplete \
+    python3-colcon-common-extensions \
+    python3-rosdep python3-vcstool \
+    ros-${ROS_DISTRO}-gazebo-ros-pkgs && \
+    rosdep init && \
     rm -rf /var/lib/apt/lists/*
+
+RUN gosu ubuntu rosdep update && \
+    grep -F "source /opt/ros/${ROS_DISTRO}/setup.bash" /home/ubuntu/.bashrc || echo "source /opt/ros/${ROS_DISTRO}/setup.bash" >> /home/ubuntu/.bashrc && \
+    sudo chown ubuntu:ubuntu /home/ubuntu/.bashrc
+
+# temporally fix to enable resize uri
+# https://github.com/fcwu/docker-ubuntu-vnc-desktop/pull/247
+RUN sed -i "s#location ~ .*/(api/.*|websockify) {#location ~ .*/(api/.*|websockify|resize) {#" /etc/nginx/sites-enabled/default
+
 ENV USER ubuntu
