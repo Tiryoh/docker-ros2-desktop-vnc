@@ -61,18 +61,10 @@ jobs:
           mkdir -p build_log
           docker image ls "$DOCKER_USERNAME/*" | tee ./build_log/docker_images.txt
 
-      - name: Install trivy
-        run: |
-          sudo apt-get install apt-transport-https gnupg
-          wget -qO - https://aquasecurity.github.io/trivy-repo/deb/public.key | sudo apt-key add -
-          echo deb https://aquasecurity.github.io/trivy-repo/deb $(lsb_release -cs) main | sudo tee -a /etc/apt/sources.list.d/trivy.list
-          sudo apt-get update
-          sudo apt-get install trivy
-
       - name: Run Trivy vulnerability scanner
         uses: aquasecurity/trivy-action@master
         with:
-          image-ref: '${{ matrix.ros-distro }}-${{ matrix.arch }}'
+          image-ref: '${{ env.DOCKER_USERNAME }}/${{ matrix.ros-distro }}-${{ matrix.arch }}'
           exit-code: '0'
           vuln-type: 'os,library'
           severity: 'CRITICAL,HIGH'
