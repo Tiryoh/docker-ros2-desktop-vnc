@@ -18,18 +18,43 @@ jobs:
   build:
     strategy:
       matrix:
-        ros-distro: [foxy, foxy-arm64, galactic, galactic-arm64, rolling, rolling-arm64]
+        ros-distro: [foxy, galactic, rolling]
+        arch: [arm64, amd64]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
 
       - uses: docker/setup-qemu-action@v1
 
+      - name: Prepare Docker metadata
+        id: meta
+        uses: docker/metadata-action@v3
+        with:
+          images: |
+            ${{ env.DOCKER_USERNAME }}/${{ env.DOCKER_IMAGENAME }}
+          tags: |
+            type=raw,value=${{ matrix.ros-distro }}-${{ matrix.arch }}-{{date 'YYYYMMDDTHHmm'}}
+            type=raw,value=${{ matrix.ros-distro }}-${{ matrix.arch }}
+          flavor: |
+            latest=false
+            prefix=
+            suffix=
+
+      - name: Parse docker build option
+        id: docker-build-option
+        run: |
+          LABELS=$(cat << EOF | grep -E "=." | sed -e "s/org\./--label org./g" | sed -e "s/--label org\(.*\)=\(.*\)$/--label org\1='\2'/g"
+          ${{ steps.meta.outputs.labels }}
+          EOF
+          )
+          echo $LABELS
+          echo ::set-output name=labels::$LABELS
+
       - name: Build docker image
         env:
-          ROS_DISTRO: ${{ matrix.ros-distro }}
+          DOCKER_TAGNAME: ${{ matrix.ros-distro }}-${{ matrix.arch }}
         run: |
-          cd $ROS_DISTRO && docker build -t $DOCKER_USERNAME/$DOCKER_IMAGENAME:$ROS_DISTRO .
+          cd ${DOCKER_TAGNAME%-amd64} && docker build ${{ steps.docker-build-option.outputs.labels }} -t $DOCKER_USERNAME/$DOCKER_IMAGENAME:$DOCKER_TAGNAME .
 
       - name: List docker images
         run: |
@@ -46,13 +71,13 @@ jobs:
 
       - name: Vulnerability Scan with Trivy
         env:
-          ROS_DISTRO: ${{ matrix.ros-distro }}
+          DOCKER_TAGNAME: ${{ matrix.ros-distro }}-${{ matrix.arch }}
         run: |
           mkdir -p build_log
-          trivy --exit-code 0 --severity HIGH --no-progress $DOCKER_USERNAME/$DOCKER_IMAGENAME:$ROS_DISTRO | tee ./build_log/trivy_log-HIGH.txt
-          trivy --exit-code 0 --severity CRITICAL --no-progress $DOCKER_USERNAME/$DOCKER_IMAGENAME:$ROS_DISTRO | tee ./build_log/trivy_log-CRITICAL.txt
+          trivy --exit-code 0 --severity HIGH --no-progress $DOCKER_USERNAME/$DOCKER_IMAGENAME:$DOCKER_TAGNAME | tee ./build_log/trivy_log-HIGH.txt
+          trivy --exit-code 0 --severity CRITICAL --no-progress $DOCKER_USERNAME/$DOCKER_IMAGENAME:$DOCKER_TAGNAME | tee ./build_log/trivy_log-CRITICAL.txt
 
       - uses: actions/upload-artifact@v2
         with:
-          name: build_log-${{ matrix.ros-distro }}
+          name: build_log-${{ matrix.ros-distro }}-${{ matrix.arch }}
           path: build_log

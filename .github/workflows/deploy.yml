@@ -20,7 +20,8 @@ jobs:
   build-and-deploy:
     strategy:
       matrix:
-        ros-distro: [foxy-amd64, foxy-arm64, galactic-amd64, galactic-arm64, rolling, rolling-arm64]
+        ros-distro: [foxy, galactic, rolling]
+        arch: [arm64, amd64]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
@@ -34,8 +35,8 @@ jobs:
           images: |
             ${{ env.DOCKER_USERNAME }}/${{ env.DOCKER_IMAGENAME }}
           tags: |
-            type=raw,value=${{ matrix.ros-distro }}-{{date 'YYYYMMDDTHHmm'}}
-            type=raw,value=${{ matrix.ros-distro }}
+            type=raw,value=${{ matrix.ros-distro }}-${{ matrix.arch }}-{{date 'YYYYMMDDTHHmm'}}
+            type=raw,value=${{ matrix.ros-distro }}-${{ matrix.arch }}
           flavor: |
             latest=false
             prefix=
@@ -53,7 +54,7 @@ jobs:
 
       - name: Build docker image
         env:
-          DOCKER_TAGNAME: ${{ matrix.ros-distro }}
+          DOCKER_TAGNAME: ${{ matrix.ros-distro }}-${{ matrix.arch }}
         run: |
           cd ${DOCKER_TAGNAME%-amd64} && docker build ${{ steps.docker-build-option.outputs.labels }} -t $DOCKER_USERNAME/$DOCKER_IMAGENAME:$DOCKER_TAGNAME .
 
@@ -72,7 +73,7 @@ jobs:
 
       - name: Publish docker image
         env:
-          DOCKER_TAGNAME: ${{ matrix.ros-distro }}
+          DOCKER_TAGNAME: ${{ matrix.ros-distro }}-${{ matrix.arch }}
         id: docker
         run: |
           TIMESTAMP=$(date '+%Y%m%dT%H%M')
@@ -97,14 +98,14 @@ jobs:
         uses: Tiryoh/gha-jobid-action@v0
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          job_name: build-and-deploy (${{ matrix.ros-distro }})
+          job_name: build-and-deploy (${{ matrix.ros-distro }}, ${{ matrix.arch }})
 
       - name: Update GitHub wiki
         env:
-          DOCKER_TAGNAME: ${{ matrix.ros-distro }}
-          DOCKER_SNAPSHOT: ${{ matrix.ros-distro }}-${{ steps.docker.outputs.timestamp }}
+          DOCKER_TAGNAME: ${{ matrix.ros-distro }}-${{ matrix.arch }}
+          DOCKER_SNAPSHOT: ${{ matrix.ros-distro }}-${{ matrix.arch }}-${{ steps.docker.outputs.timestamp }}
           DOCKER_DIGEST_RAW: ${{ steps.docker.outputs.digest }}
-          TARGET_MD_NAME: ${{ matrix.ros-distro }}
+          TARGET_MD_NAME: ${{ matrix.ros-distro }}-${{ matrix.arch }}
         run: |
           DOCKER_DIGEST=$(echo $DOCKER_DIGEST_RAW | sed -E 's/.*@sha256:(.*)/sha256-\1/g')
           DOCKER_DIGEST_SHORT=$(echo $DOCKER_DIGEST | sed -E 's/.*([0-9a-z]{12})[0-9a-z]{52}$/\1/g')
