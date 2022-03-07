@@ -69,15 +69,18 @@ jobs:
           sudo apt-get update
           sudo apt-get install trivy
 
-      - name: Vulnerability Scan with Trivy
-        env:
-          DOCKER_TAGNAME: ${{ matrix.ros-distro }}-${{ matrix.arch }}
-        run: |
-          mkdir -p build_log
-          trivy --exit-code 0 --severity HIGH --no-progress $DOCKER_USERNAME/$DOCKER_IMAGENAME:$DOCKER_TAGNAME | tee ./build_log/trivy_log-HIGH.txt
-          trivy --exit-code 0 --severity CRITICAL --no-progress $DOCKER_USERNAME/$DOCKER_IMAGENAME:$DOCKER_TAGNAME | tee ./build_log/trivy_log-CRITICAL.txt
-
-      - uses: actions/upload-artifact@v2
+      - name: Run Trivy vulnerability scanner
+        uses: aquasecurity/trivy-action@master
         with:
-          name: build_log-${{ matrix.ros-distro }}-${{ matrix.arch }}
-          path: build_log
+          image-ref: '${{ matrix.ros-distro }}-${{ matrix.arch }}'
+          exit-code: '0'
+          vuln-type: 'os,library'
+          severity: 'CRITICAL,HIGH'
+          format: 'template'
+          template: '@/contrib/sarif.tpl'
+          output: 'trivy-results.sarif'
+
+      - name: Upload Trivy scan results to GitHub Security tab
+        uses: github/codeql-action/upload-sarif@v1
+        with:
+          sarif_file: 'trivy-results.sarif'
