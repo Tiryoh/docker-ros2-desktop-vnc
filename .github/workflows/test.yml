@@ -18,41 +18,61 @@ jobs:
   build:
     strategy:
       matrix:
-        ros-distro: [foxy, foxy-arm64, galactic, galactic-arm64, rolling, rolling-arm64]
+        ros-distro: [foxy, galactic, rolling]
+        arch: [arm64, amd64]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
 
       - uses: docker/setup-qemu-action@v1
 
+      - name: Prepare Docker metadata
+        id: meta
+        uses: docker/metadata-action@v3
+        with:
+          images: |
+            ${{ env.DOCKER_USERNAME }}/${{ env.DOCKER_IMAGENAME }}
+          tags: |
+            type=raw,value=${{ matrix.ros-distro }}-${{ matrix.arch }}-{{date 'YYYYMMDDTHHmm'}}
+            type=raw,value=${{ matrix.ros-distro }}-${{ matrix.arch }}
+          flavor: |
+            latest=false
+            prefix=
+            suffix=
+
+      - name: Parse docker build option
+        id: docker-build-option
+        run: |
+          LABELS=$(cat << EOF | grep -E "=." | sed -e "s/org\./--label org./g" | sed -e "s/--label org\(.*\)=\(.*\)$/--label org\1='\2'/g"
+          ${{ steps.meta.outputs.labels }}
+          EOF
+          )
+          echo $LABELS
+          echo ::set-output name=labels::$LABELS
+
       - name: Build docker image
         env:
-          ROS_DISTRO: ${{ matrix.ros-distro }}
+          DOCKER_TAGNAME: ${{ matrix.ros-distro }}-${{ matrix.arch }}
         run: |
-          cd $ROS_DISTRO && docker build -t $DOCKER_USERNAME/$DOCKER_IMAGENAME:$ROS_DISTRO .
+          cd ${DOCKER_TAGNAME%-amd64} && docker build ${{ steps.docker-build-option.outputs.labels }} -t $DOCKER_USERNAME/$DOCKER_IMAGENAME:$DOCKER_TAGNAME .
 
       - name: List docker images
         run: |
           mkdir -p build_log
           docker image ls "$DOCKER_USERNAME/*" | tee ./build_log/docker_images.txt
 
-      - name: Install trivy
-        run: |
-          sudo apt-get install apt-transport-https gnupg
-          wget -qO - https://aquasecurity.github.io/trivy-repo/deb/public.key | sudo apt-key add -
-          echo deb https://aquasecurity.github.io/trivy-repo/deb $(lsb_release -cs) main | sudo tee -a /etc/apt/sources.list.d/trivy.list
-          sudo apt-get update
-          sudo apt-get install trivy
-
-      - name: Vulnerability Scan with Trivy
-        env:
-          ROS_DISTRO: ${{ matrix.ros-distro }}
-        run: |
-          mkdir -p build_log
-          trivy --exit-code 0 --severity HIGH --no-progress $DOCKER_USERNAME/$DOCKER_IMAGENAME:$ROS_DISTRO | tee ./build_log/trivy_log-HIGH.txt
-          trivy --exit-code 0 --severity CRITICAL --no-progress $DOCKER_USERNAME/$DOCKER_IMAGENAME:$ROS_DISTRO | tee ./build_log/trivy_log-CRITICAL.txt
-
-      - uses: actions/upload-artifact@v2
+      - name: Run Trivy vulnerability scanner
+        uses: aquasecurity/trivy-action@master
         with:
-          name: build_log-${{ matrix.ros-distro }}
-          path: build_log
+          image-ref: '${{ env.DOCKER_USERNAME }}/${{ env.DOCKER_IMAGENAME }}:${{ matrix.ros-distro }}-${{ matrix.arch }}'
+          exit-code: '0'
+          vuln-type: 'os,library'
+          severity: 'CRITICAL,HIGH'
+          format: 'template'
+          template: '@/contrib/sarif.tpl'
+          output: 'trivy-results.sarif'
+
+      - name: Upload Trivy scan results to GitHub Security tab
+        uses: github/codeql-action/upload-sarif@v1
+        with:
+          sarif_file: 'trivy-results.sarif'
