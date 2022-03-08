@@ -64,7 +64,7 @@ jobs:
       - name: Run Trivy vulnerability scanner
         uses: aquasecurity/trivy-action@master
         with:
-          image-ref: '${{ env.DOCKER_USERNAME }}/${{ matrix.ros-distro }}-${{ matrix.arch }}'
+          image-ref: '${{ env.DOCKER_USERNAME }}/${{ env.DOCKER_IMAGENAME }}/${{ matrix.ros-distro }}-${{ matrix.arch }}'
           exit-code: '0'
           vuln-type: 'os,library'
           severity: 'CRITICAL,HIGH'
