@@ -19,6 +19,7 @@ env:
 jobs:
   build-and-deploy:
     strategy:
+      fail-fast: false
       matrix:
         ros-distro: [foxy, galactic, rolling]
         arch: [arm64, amd64]
