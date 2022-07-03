@@ -15,7 +15,7 @@
 FROM dorowu/ubuntu-desktop-lxde-vnc:focal-arm64
 LABEL maintainer="Tiryoh<tiryoh@gmail.com>"
 
-RUN echo "Set disable_coredump false" >> /etc/sudo.conf
+RUN wget -q -O - https://dl.google.com/linux/linux_signing_key.pub | apt-key add - 
 RUN apt-get update -q && \
     apt-get upgrade -yq && \
     DEBIAN_FRONTEND=noninteractive apt-get install -yq wget curl git build-essential vim sudo lsb-release locales bash-completion tzdata gosu && \
