@@ -26,6 +26,12 @@ Change the `shm-size` value depending on the situation.
 docker run -p 6080:80 --shm-size=512m tiryoh/ros2-desktop-vnc:foxy
 ```
 
+__NOTE__: `--security-opt seccomp=unconfined` flag is required to launch humble image. See https://github.com/Tiryoh/docker-ros2-desktop-vnc/pull/56.
+
+```
+docker run -p 6080:80 --shm-size=512m --security-opt seccomp=unconfined tiryoh/ros2-desktop-vnc:humble
+```
+
 Browse http://127.0.0.1:6080/.
 
 ![Image from Gyazo](https://i.gyazo.com/ab43ab3f6dc10b5186416499e49d0bbe.jpg)
@@ -54,12 +60,24 @@ cd foxy && docker build -t tiryoh/ros2-desktop-vnc:foxy .
 cd galactic && docker build -t tiryoh/ros2-desktop-vnc:galactic .
 ```
 
+* humble
+```
+cd humble && docker build -t tiryoh/ros2-desktop-vnc:humble .
+```
+
+* rolling
+```
+cd rolling && docker build -t tiryoh/ros2-desktop-vnc:rolling .
+```
+
 ## Docker tags on hub.docker.com
 
 * ~~[`dashing`](https://hub.docker.com/r/tiryoh/ros2-desktop-vnc/tags?page=1&name=dashing) which is based on [`dashing/Dockerfile`](./dashing/Dockerfile)~~ deprecated
 * ~~[`eloquent`](https://hub.docker.com/r/tiryoh/ros2-desktop-vnc/tags?page=1&name=eloquent) which is based on [`eloquent/Dockerfile`](./eloquent/Dockerfile)~~ deprecated
 * [`foxy`](https://hub.docker.com/r/tiryoh/ros2-desktop-vnc/tags?page=1&name=foxy), [`latest`](https://hub.docker.com/r/tiryoh/ros2-desktop-vnc/tags?page=1&name=latest) which is based on [`foxy/Dockerfile`](./foxy/Dockerfile)
 * [`galactic`](https://hub.docker.com/r/tiryoh/ros2-desktop-vnc/tags?page=1&name=galactic) which is based on [`galactic/Dockerfile`](./galactic/Dockerfile)
+* [`humble`](https://hub.docker.com/r/tiryoh/ros2-desktop-vnc/tags?page=1&name=humble) which is based on [`humble/Dockerfile`](./humble/Dockerfile)
+* [`rolling`](https://hub.docker.com/r/tiryoh/ros2-desktop-vnc/tags?page=1&name=rolling) which is based on [`rolling/Dockerfile`](./rolling/Dockerfile)
 
 Docker tags and build logs are listed on this page.  
 https://github.com/Tiryoh/docker-ros2-desktop-vnc/wiki
