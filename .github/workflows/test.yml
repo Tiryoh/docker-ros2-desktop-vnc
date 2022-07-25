@@ -9,6 +9,7 @@ on:
       - ".github/workflows/test.yml"
   schedule:
     - cron: "0 2 * * 0" # Weekly on Sundays at 02:00
+  workflow_dispatch:
 
 env:
   DOCKER_USERNAME: tiryoh
@@ -19,7 +20,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        ros-distro: [foxy, galactic, rolling]
+        ros-distro: [foxy, galactic, humble rolling]
         arch: [arm64, amd64]
     runs-on: ubuntu-latest
     steps:
@@ -55,7 +56,11 @@ jobs:
         env:
           DOCKER_TAGNAME: ${{ matrix.ros-distro }}-${{ matrix.arch }}
         run: |
-          cd ${DOCKER_TAGNAME%-amd64} && docker build ${{ steps.docker-build-option.outputs.labels }} -t $DOCKER_USERNAME/$DOCKER_IMAGENAME:$DOCKER_TAGNAME .
+          if [[ -d ${DOCKER_TAGNAME%-amd64} ]]; then
+              cd ${DOCKER_TAGNAME%-amd64} && docker build ${{ steps.docker-build-option.outputs.labels }} -t $DOCKER_USERNAME/$DOCKER_IMAGENAME:$DOCKER_TAGNAME .
+          else
+              cd ${DOCKER_TAGNAME} && docker build ${{ steps.docker-build-option.outputs.labels }} -t $DOCKER_USERNAME/$DOCKER_IMAGENAME:$DOCKER_TAGNAME .
+          fi
 
       - name: List docker images
         run: |
