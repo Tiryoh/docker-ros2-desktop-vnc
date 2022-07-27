@@ -15,6 +15,8 @@
 FROM tiryoh/ubuntu-desktop-lxde-vnc:jammy
 LABEL maintainer="Tiryoh<tiryoh@gmail.com>"
 
+SHELL ["/bin/bash", "-c"]
+
 RUN apt-get update -q && \
     apt-get upgrade -yq && \
     DEBIAN_FRONTEND=noninteractive apt-get install -yq wget curl git build-essential vim sudo lsb-release locales bash-completion tzdata gosu && \
@@ -34,13 +36,23 @@ RUN apt-get update -q && \
     apt-get install -y ros-${ROS_DISTRO}-${INSTALL_PACKAGE} \
     python3-argcomplete \
     python3-colcon-common-extensions \
-    python3-rosdep python3-vcstool \
-    ros-${ROS_DISTRO}-gazebo-ros-pkgs && \
+    python3-rosdep python3-vcstool && \
     rosdep init && \
+    rm -rf /var/lib/apt/lists/*
+
+# Install simulation package only on amd64
+# Not ready for arm64 for now (July 28th, 2020)
+# https://github.com/Tiryoh/docker-ros2-desktop-vnc/pull/56#issuecomment-1196359860
+RUN apt-get update -q && \
+    [[ "$(dpkg --print-architecture)" == "amd64" ]] && apt-get install -y \
+    ros-${ROS_DISTRO}-gazebo-ros-pkgs && \
     rm -rf /var/lib/apt/lists/*
 
 RUN gosu ubuntu rosdep update && \
     grep -F "source /opt/ros/${ROS_DISTRO}/setup.bash" /home/ubuntu/.bashrc || echo "source /opt/ros/${ROS_DISTRO}/setup.bash" >> /home/ubuntu/.bashrc && \
     sudo chown ubuntu:ubuntu /home/ubuntu/.bashrc
+
+RUN echo 'sed -i -e "s/palette_color_4=rgb([0-9,]*)/palette_color_4=rgb(51,61,255)/g" $HOME/.config/lxterminal/lxterminal.conf' > /usr/local/bin/update-lxterminal.sh && \
+    chmod +x /usr/local/bin/update-lxterminal.sh
 
 ENV USER ubuntu
