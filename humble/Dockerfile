@@ -45,7 +45,8 @@ RUN apt-get update -q && \
 # https://github.com/Tiryoh/docker-ros2-desktop-vnc/pull/56#issuecomment-1196359860
 RUN apt-get update -q && \
     [[ "$(dpkg --print-architecture)" == "amd64" ]] && apt-get install -y \
-    ros-${ROS_DISTRO}-gazebo-ros-pkgs && \
+    ros-${ROS_DISTRO}-gazebo-ros-pkgs \
+    ros-${ROS_DISTRO}-ros-ign && \
     rm -rf /var/lib/apt/lists/*
 
 RUN gosu ubuntu rosdep update && \
