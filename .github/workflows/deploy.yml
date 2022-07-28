@@ -23,7 +23,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        ros-distro: [foxy, galactic, rolling]
+        ros-distro: [foxy, galactic, humble, rolling]
         arch: [arm64, amd64]
     runs-on: ubuntu-latest
     steps:
@@ -191,108 +191,3 @@ jobs:
           docker manifest create --amend ghcr.io/${DOCKER_USERNAME}/${DOCKER_IMAGENAME}:latest ghcr.io/${DOCKER_USERNAME}/${DOCKER_IMAGENAME}:${ROS_DISTRO}-amd64 ghcr.io/${DOCKER_USERNAME}/${DOCKER_IMAGENAME}:${ROS_DISTRO}-arm64
           docker manifest annotate ghcr.io/${DOCKER_USERNAME}/${DOCKER_IMAGENAME}:latest ghcr.io/${DOCKER_USERNAME}/${DOCKER_IMAGENAME}:${ROS_DISTRO}-arm64 --arch arm64 
           docker manifest push ghcr.io/${DOCKER_USERNAME}/${DOCKER_IMAGENAME}:latest
-
-  build-and-deploy-with-buildx:
-    runs-on: ubuntu-latest
-    strategy:
-      fail-fast: false
-      matrix:
-        ros-distro:
-          - humble
-
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v3
-
-      - name: Setup QEMU
-        uses: docker/setup-qemu-action@v1
-
-      - name: Setup Docker Buildx
-        id: buildx
-        uses: docker/setup-buildx-action@v1
-
-      - name: Login to docker.io
-        uses: docker/login-action@v1
-        with:
-          username: ${{ env.DOCKER_USERNAME }}
-          password: ${{ secrets.DOCKERHUB_TOKEN }}
-
-      - name: Cache Docker layers
-        uses: actions/cache@v2
-        with:
-          path: /tmp/.buildx-cache
-          key: ${{ runner.os }}-buildx-${{ github.sha }}
-          restore-keys: |
-            ${{ runner.os }}-buildx-
-
-      - name: Prepare Docker metadata
-        id: meta
-        uses: docker/metadata-action@v3
-        with:
-          images: |
-            ${{ env.DOCKER_USERNAME }}/${{ env.DOCKER_IMAGENAME }}
-          tags: |
-            type=raw,value=${{ matrix.ros-distro }}
-            type=raw,value=${{ matrix.ros-distro }}-{{date 'YYYYMMDDTHHmm'}}
-          flavor: |
-            latest=${{ matrix.ros-distro == 'foxy' }}
-            prefix=
-            suffix=
-
-      - name: Build and Publish
-        id: docker-build
-        uses: docker/build-push-action@v2
-        with:
-          context: ${{ matrix.ros-distro }}
-          platforms: linux/amd64, linux/arm64
-          outputs: type=registry # same as --push, push: true
-          tags: ${{ steps.meta.outputs.tags }}
-          labels: ${{ steps.meta.outputs.labels }}
-          cache-from: type=local,src=/tmp/.buildx-cache
-          cache-to: type=local,dest=/tmp/.buildx-cache-new
-
-      - # Temp fix
-        # https://github.com/docker/build-push-action/issues/252
-        # https://github.com/moby/buildkit/issues/1896
-        # https://github.com/docker/build-push-action/blob/master/docs/advanced/cache.md
-        name: Move cache
-        run: |
-          rm -rf /tmp/.buildx-cache
-          mv /tmp/.buildx-cache-new /tmp/.buildx-cache
-      - name: Get Current Job Log URL
-        id: jobs
-        uses: Tiryoh/gha-jobid-action@v0
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          job_name: build-and-deploy (${{ matrix.ros-distro }})
-
-      - name: Update wiki
-        env:
-          DOCKER_TAGNAME: ${{ matrix.ros-distro }}
-        run: |
-          DOCKER_SNAPSHOT=$(cat << EOF | grep ".*-.*T.*" | sed -E "s/.*:(.*-[0-9]*T[0-9])/\1/g"
-          ${{ steps.meta.outputs.tags }}
-          EOF)
-          echo $DOCKER_SNAPSHOT
-          DOCKER_DIGEST=${{ steps.docker-build.outputs.digest }}
-          echo $DOCKER_DIGEST
-          DOCKER_DIGEST_SHORT=$(echo ${DOCKER_DIGEST} | sed -E 's/.*([0-9a-z]{12})[0-9a-z]{52}$/\1/g')
-          echo $DOCKER_DIGEST_SHORT
-          DOCKER_SNAPSHOT_IMAGE_HISTORY_URL=$(echo "https://hub.docker.com/r/${DOCKER_USERNAME}/${DOCKER_IMAGENAME}/tags?page=1&name=${DOCKER_SNAPSHOT}")
-          git clone --depth=1 https://${GITHUB_ACTOR}:${{ secrets.GITHUB_TOKEN }}@github.com/${GITHUB_REPOSITORY}.wiki.git wiki
-          cd wiki
-          LINE=$(grep -n "add ${{ matrix.ros-distro }} msg after this line" ${{ matrix.ros-distro }}.md | cut -d ":" -f 1)
-          head -n $LINE ${{ matrix.ros-distro }}.md > tmp.md
-          echo "* \`${DOCKER_DIGEST_SHORT}\`" | tee -a tmp.md
-          echo "    * uploaded on $(date --iso-8601="minutes")" | tee -a tmp.md
-          echo "        * ${{ steps.jobs.outputs.html_url }}" | tee -a tmp.md
-          echo "    * snapshot" | tee -a tmp.md
-          echo "        * [\`${DOCKER_SNAPSHOT}\`](${DOCKER_SNAPSHOT_IMAGE_HISTORY_URL})" | tee -a tmp.md
-          tail -n +$(( $LINE+1 )) ${{ matrix.ros-distro }}.md >> tmp.md
-          mv tmp.md ${{ matrix.ros-distro }}.md
-          git config --local user.email "${GIT_CONFIG_EMAIL}"
-          git config --local user.name "${GIT_CONFIG_USER}"
-          git add ${{ matrix.ros-distro }}.md
-          git commit -m "Update ${{ matrix.ros-distro }}.md"
-          git fetch origin && git merge origin/master --no-edit && git push origin master || \
-          git fetch origin && git merge origin/master --no-edit && git push origin master
