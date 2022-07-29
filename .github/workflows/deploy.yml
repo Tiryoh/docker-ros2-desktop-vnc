@@ -9,6 +9,7 @@ on:
       - ".github/workflows/deploy.yml"
   schedule:
     - cron: "7 4 * * 0" # Weekly on Sundays at 13:07 (JST)
+  workflow_dispatch:
 
 env:
   DOCKER_USERNAME: tiryoh
@@ -21,7 +22,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        ros-distro: [foxy, galactic, rolling]
+        ros-distro: [foxy, galactic, humble, rolling]
         arch: [arm64, amd64]
     runs-on: ubuntu-latest
     steps:
