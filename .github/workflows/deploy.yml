@@ -10,7 +10,6 @@ on:
   schedule:
     - cron: "7 4 * * 0" # Weekly on Sundays at 13:07 (JST)
   workflow_dispatch:
-  pull_request:
 
 env:
   DOCKER_USERNAME: tiryoh
