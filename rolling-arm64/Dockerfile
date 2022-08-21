@@ -12,8 +12,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-FROM dorowu/ubuntu-desktop-lxde-vnc:focal-arm64
+FROM tiryoh/ubuntu-desktop-lxde-vnc:jammy-arm64
 LABEL maintainer="Tiryoh<tiryoh@gmail.com>"
+
+SHELL ["/bin/bash", "-c"]
 
 RUN apt-get update -q && \
     apt-get upgrade -yq && \
@@ -42,9 +44,5 @@ RUN apt-get update -q && \
 RUN gosu ubuntu rosdep update && \
     grep -F "source /opt/ros/${ROS_DISTRO}/setup.bash" /home/ubuntu/.bashrc || echo "source /opt/ros/${ROS_DISTRO}/setup.bash" >> /home/ubuntu/.bashrc && \
     sudo chown ubuntu:ubuntu /home/ubuntu/.bashrc
-
-# temporally fix to enable resize uri
-# https://github.com/fcwu/docker-ubuntu-vnc-desktop/pull/247
-RUN sed -i "s#location ~ .*/(api/.*|websockify) {#location ~ .*/(api/.*|websockify|resize) {#" /etc/nginx/sites-enabled/default
 
 ENV USER ubuntu
