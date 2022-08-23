@@ -12,10 +12,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-FROM dorowu/ubuntu-desktop-lxde-vnc:focal
+FROM tiryoh/ubuntu-desktop-lxde-vnc:jammy
 LABEL maintainer="Tiryoh<tiryoh@gmail.com>"
 
-RUN wget -q -O - https://dl.google.com/linux/linux_signing_key.pub | apt-key add - 
+SHELL ["/bin/bash", "-c"]
+
 RUN apt-get update -q && \
     apt-get upgrade -yq && \
     DEBIAN_FRONTEND=noninteractive apt-get install -yq wget curl git build-essential vim sudo lsb-release locales bash-completion tzdata gosu && \
@@ -43,9 +44,5 @@ RUN apt-get update -q && \
 RUN gosu ubuntu rosdep update && \
     grep -F "source /opt/ros/${ROS_DISTRO}/setup.bash" /home/ubuntu/.bashrc || echo "source /opt/ros/${ROS_DISTRO}/setup.bash" >> /home/ubuntu/.bashrc && \
     sudo chown ubuntu:ubuntu /home/ubuntu/.bashrc
-
-# temporally fix to enable resize uri
-# https://github.com/fcwu/docker-ubuntu-vnc-desktop/pull/247
-RUN sed -i "s#location ~ .*/(api/.*|websockify) {#location ~ .*/(api/.*|websockify|resize) {#" /etc/nginx/sites-enabled/default
 
 ENV USER ubuntu
