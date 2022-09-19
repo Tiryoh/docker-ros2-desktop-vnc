@@ -2,6 +2,38 @@
 ## [Unreleased]
 
 
+<a name="v1.4.0"></a>
+## [v1.4.0] - 2022-09-20
+### CI
+- Add dependabot.yml ([#48](https://github.com/Tiryoh/docker-ros2-desktop-vnc/issues/48))
+- Allow execution even if other jobs fail ([#49](https://github.com/Tiryoh/docker-ros2-desktop-vnc/issues/49))
+- Refactor GitHub Actions config file ([#46](https://github.com/Tiryoh/docker-ros2-desktop-vnc/issues/46))
+- Update tag release CI trigger condition ([#41](https://github.com/Tiryoh/docker-ros2-desktop-vnc/issues/41))
+
+### Chore
+- Update git-chglog config to add dependabot log ([#63](https://github.com/Tiryoh/docker-ros2-desktop-vnc/issues/63))
+- bump docker/metadata-action from 3 to 4 ([#51](https://github.com/Tiryoh/docker-ros2-desktop-vnc/issues/51))
+- bump docker/setup-qemu-action from 1 to 2 ([#54](https://github.com/Tiryoh/docker-ros2-desktop-vnc/issues/54))
+- bump github/codeql-action from 1 to 2 ([#55](https://github.com/Tiryoh/docker-ros2-desktop-vnc/issues/55))
+- bump docker/login-action from 1 to 2 ([#53](https://github.com/Tiryoh/docker-ros2-desktop-vnc/issues/53))
+- bump actions/checkout from 2 to 3 ([#52](https://github.com/Tiryoh/docker-ros2-desktop-vnc/issues/52))
+- Add docker label ([#40](https://github.com/Tiryoh/docker-ros2-desktop-vnc/issues/40))
+
+### Documentation
+- Add related projects link ([#61](https://github.com/Tiryoh/docker-ros2-desktop-vnc/issues/61))
+
+### Features
+- Upgrade rolling base image to Ubuntu 22.04 ([#59](https://github.com/Tiryoh/docker-ros2-desktop-vnc/issues/59))
+- Add ROS 2 Humble Dockerfile ([#56](https://github.com/Tiryoh/docker-ros2-desktop-vnc/issues/56))
+- Add ROS 2 Rolling Ridley ([#44](https://github.com/Tiryoh/docker-ros2-desktop-vnc/issues/44))
+
+### Fix
+- Update hotfix ([#50](https://github.com/Tiryoh/docker-ros2-desktop-vnc/issues/50))
+
+### Refactor
+- Merge install script into Dockerfile ([#45](https://github.com/Tiryoh/docker-ros2-desktop-vnc/issues/45))
+
+
 <a name="v1.3.0"></a>
 ## [v1.3.0] - 2022-01-09
 ### CI
@@ -76,7 +108,8 @@
 - Fix dashing tag image ([#14](https://github.com/Tiryoh/docker-ros2-desktop-vnc/issues/14))
 
 
-[Unreleased]: https://github.com/Tiryoh/docker-ros2-desktop-vnc/compare/v1.3.0...HEAD
+[Unreleased]: https://github.com/Tiryoh/docker-ros2-desktop-vnc/compare/v1.4.0...HEAD
+[v1.4.0]: https://github.com/Tiryoh/docker-ros2-desktop-vnc/compare/v1.3.0...v1.4.0
 [v1.3.0]: https://github.com/Tiryoh/docker-ros2-desktop-vnc/compare/v1.2.0...v1.3.0
 [v1.2.0]: https://github.com/Tiryoh/docker-ros2-desktop-vnc/compare/v1.1.0...v1.2.0
 [v1.1.0]: https://github.com/Tiryoh/docker-ros2-desktop-vnc/compare/v1.0.0...v1.1.0
