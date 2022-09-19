@@ -82,6 +82,13 @@ cd rolling && docker build -t tiryoh/ros2-desktop-vnc:rolling .
 Docker tags and build logs are listed on this page.  
 https://github.com/Tiryoh/docker-ros2-desktop-vnc/wiki
 
+## Related projects
+
+* https://github.com/atinfinity/nvidia-egl-desktop-ros2
+  * Dockerfile to use ROS 2 on Xfce Desktop container with NVIDIA GPU support via VNC/[Selkies](https://github.com/selkies-project/selkies-gstreamer)(Full desktop streaming with WebRTC)
+* https://github.com/fcwu/docker-ubuntu-vnc-desktop
+  * Dockerfile to access Ubuntu Xfce/LXDE/LxQT desktop environment via web VNC interface 
+
 ## License
 
 Copyright 2020 Tiryoh\<tiryoh@gmail.com\>
