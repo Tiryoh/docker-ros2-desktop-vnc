@@ -36,10 +36,18 @@ RUN apt-get update -q && \
     apt-get install -y ros-${ROS_DISTRO}-${INSTALL_PACKAGE} \
     python3-argcomplete \
     python3-colcon-common-extensions \
-    python3-rosdep python3-vcstool \
-    ros-${ROS_DISTRO}-gazebo-ros-pkgs && \
+    python3-rosdep python3-vcstool && \
     rosdep init && \
     rm -rf /var/lib/apt/lists/*
+
+# Install simulation package only on amd64
+# Not ready for arm64 for now (July 28th, 2020)
+# https://github.com/Tiryoh/docker-ros2-desktop-vnc/pull/56#issuecomment-1196359860
+# RUN apt-get update -q && \
+#     apt-get install -y \
+#     ros-${ROS_DISTRO}-gazebo-ros-pkgs \
+#     ros-${ROS_DISTRO}-ros-ign && \
+#     rm -rf /var/lib/apt/lists/*
 
 RUN gosu ubuntu rosdep update && \
     grep -F "source /opt/ros/${ROS_DISTRO}/setup.bash" /home/ubuntu/.bashrc || echo "source /opt/ros/${ROS_DISTRO}/setup.bash" >> /home/ubuntu/.bashrc && \
