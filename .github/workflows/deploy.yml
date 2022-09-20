@@ -25,6 +25,7 @@ jobs:
         ros-distro: [foxy, galactic, humble, rolling]
         arch: [arm64, amd64]
     runs-on: ubuntu-latest
+    timeout-minutes: 150
     steps:
       - uses: actions/checkout@v3
 
@@ -58,7 +59,7 @@ jobs:
         env:
           DOCKER_TAGNAME: ${{ matrix.ros-distro }}-${{ matrix.arch }}
         run: |
-          cd ${DOCKER_TAGNAME%-amd64} && docker build ${{ steps.docker-build-option.outputs.labels }} -t $DOCKER_USERNAME/$DOCKER_IMAGENAME:$DOCKER_TAGNAME .
+          cd ${DOCKER_TAGNAME%-amd64} && docker buildx build --platform=linux/${{ matrix.arch }} --progress=plain ${{ steps.docker-build-option.outputs.labels }} -t $DOCKER_USERNAME/$DOCKER_IMAGENAME:$DOCKER_TAGNAME .
 
       - name: Login to ghcr.io
         uses: docker/login-action@v2
