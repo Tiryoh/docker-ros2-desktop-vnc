@@ -132,18 +132,21 @@ jobs:
           git fetch origin && git merge origin/master --no-edit && git push origin master || \
           git fetch origin && git merge origin/master --no-edit && git push origin master
 
+
+  # Since the Dockerfile differs between linux/arm64 and linux/amd64, the method editing the manifest directly is used.
+  # Use buildx when the Dockerfile can be merged into one file, like https://github.com/Tiryoh/docker-ros2/blob/master/.github/workflows/deploy.yml
   upload:
     needs: [build-and-deploy]
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
       matrix:
-        ros-distro: [foxy, galactic]
+        ros-distro: [foxy, galactic, humble, rolling]
     steps:
       - name: Prepare Docker
-        run: |	
-          mkdir -p ~/.docker	
-          grep -q '{' ~/.docker/config.json || echo '{}' | tee ~/.docker/config.json > /dev/null	
+        run: |
+          mkdir -p ~/.docker
+          grep -q '{' ~/.docker/config.json || echo '{}' | tee ~/.docker/config.json > /dev/null
           jq '. |= .+ {"experimental": "enabled"}' ~/.docker/config.json > ~/docker-config.json && mv ~/docker-config.json ~/.docker/config.json
           sudo service docker restart
 
