@@ -19,7 +19,7 @@ SHELL ["/bin/bash", "-c"]
 
 RUN apt-get update -q && \
     apt-get upgrade -yq && \
-    DEBIAN_FRONTEND=noninteractive apt-get install -yq wget curl git build-essential vim sudo lsb-release locales bash-completion tzdata gosu && \
+    DEBIAN_FRONTEND=noninteractive apt-get install -yq --no-install-recommends wget curl git build-essential vim sudo lsb-release locales bash-completion tzdata gosu terminator && \
     rm -rf /var/lib/apt/lists/*
 RUN useradd --create-home --home-dir /home/ubuntu --shell /bin/bash --user-group --groups adm,sudo ubuntu && \
     echo ubuntu:ubuntu | chpasswd && \
@@ -52,8 +52,5 @@ RUN apt-get update -q && \
 RUN gosu ubuntu rosdep update && \
     grep -F "source /opt/ros/${ROS_DISTRO}/setup.bash" /home/ubuntu/.bashrc || echo "source /opt/ros/${ROS_DISTRO}/setup.bash" >> /home/ubuntu/.bashrc && \
     sudo chown ubuntu:ubuntu /home/ubuntu/.bashrc
-
-RUN echo 'sed -i -e "s/palette_color_4=rgb([0-9,]*)/palette_color_4=rgb(51,61,255)/g" $HOME/.config/lxterminal/lxterminal.conf' > /usr/local/bin/update-lxterminal.sh && \
-    chmod +x /usr/local/bin/update-lxterminal.sh
 
 ENV USER ubuntu
