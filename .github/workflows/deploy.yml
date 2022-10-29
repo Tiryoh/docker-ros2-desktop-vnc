@@ -24,7 +24,7 @@ jobs:
       matrix:
         ros-distro: [foxy, galactic, humble, rolling]
         arch: [arm64, amd64]
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
     timeout-minutes: 120
     steps:
       - uses: actions/checkout@v3
