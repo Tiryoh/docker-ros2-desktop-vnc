@@ -25,7 +25,7 @@ jobs:
         ros-distro: [foxy, galactic, humble, rolling]
         arch: [arm64, amd64]
     runs-on: ubuntu-20.04
-    timeout-minutes: 120
+    timeout-minutes: 180
     steps:
       - uses: actions/checkout@v3
 
