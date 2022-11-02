@@ -59,7 +59,7 @@ jobs:
         env:
           DOCKER_TAGNAME: ${{ matrix.ros-distro }}-${{ matrix.arch }}
         run: |
-          cd ${DOCKER_TAGNAME%-amd64} && docker buildx build --platform=linux/${{ matrix.arch }} --progress=plain ${{ steps.docker-build-option.outputs.labels }} -t $DOCKER_USERNAME/$DOCKER_IMAGENAME:$DOCKER_TAGNAME .
+          cd ${DOCKER_TAGNAME%-amd64} && docker buildx build --no-cache --platform=linux/${{ matrix.arch }} --progress=plain ${{ steps.docker-build-option.outputs.labels }} -t $DOCKER_USERNAME/$DOCKER_IMAGENAME:$DOCKER_TAGNAME .
 
       - name: Login to ghcr.io
         uses: docker/login-action@v2
@@ -95,6 +95,16 @@ jobs:
           docker push $DOCKER_USERNAME/$DOCKER_IMAGENAME:${DOCKER_TAGNAME%-amd64}-$TIMESTAMP
           echo ::set-output name=timestamp::$TIMESTAMP
           echo ::set-output name=digest::$(docker inspect --format='{{index .RepoDigests 0}}' $DOCKER_USERNAME/$DOCKER_IMAGENAME:$DOCKER_TAGNAME-$TIMESTAMP)
+
+      - name: Cleanup docker image cache
+        env:
+          DOCKER_TAGNAME: ${{ matrix.ros-distro }}-${{ matrix.arch }}
+          TIMESTAMP: ${{ steps.docker.outputs.timestamp }}
+        run: |
+          docker rmi ghcr.io/$DOCKER_USERNAME/$DOCKER_IMAGENAME:$DOCKER_TAGNAME-$TIMESTAMP
+          docker rmi ghcr.io/$DOCKER_USERNAME/$DOCKER_IMAGENAME:${DOCKER_TAGNAME%-amd64}-$TIMESTAMP
+          docker rmi $DOCKER_USERNAME/$DOCKER_IMAGENAME:$DOCKER_TAGNAME-$TIMESTAMP
+          docker rmi $DOCKER_USERNAME/$DOCKER_IMAGENAME:${DOCKER_TAGNAME%-amd64}-$TIMESTAMP
 
       - name: Get Current Job Log URL
         id: jobs
@@ -194,3 +204,12 @@ jobs:
           docker manifest create --amend ghcr.io/${DOCKER_USERNAME}/${DOCKER_IMAGENAME}:latest ghcr.io/${DOCKER_USERNAME}/${DOCKER_IMAGENAME}:${ROS_DISTRO}-amd64 ghcr.io/${DOCKER_USERNAME}/${DOCKER_IMAGENAME}:${ROS_DISTRO}-arm64
           docker manifest annotate ghcr.io/${DOCKER_USERNAME}/${DOCKER_IMAGENAME}:latest ghcr.io/${DOCKER_USERNAME}/${DOCKER_IMAGENAME}:${ROS_DISTRO}-arm64 --arch arm64 
           docker manifest push ghcr.io/${DOCKER_USERNAME}/${DOCKER_IMAGENAME}:latest
+
+      - name: Cleanup docker image cache
+        env:
+          ROS_DISTRO: ${{ matrix.ros-distro }}
+        run: |
+          docker rmi ghcr.io/${DOCKER_USERNAME}/${DOCKER_IMAGENAME}:${ROS_DISTRO}-amd64
+          docker rmi ghcr.io/${DOCKER_USERNAME}/${DOCKER_IMAGENAME}:${ROS_DISTRO}-arm64
+          docker rmi ${DOCKER_USERNAME}/${DOCKER_IMAGENAME}:${ROS_DISTRO}-amd64
+          docker rmi ${DOCKER_USERNAME}/${DOCKER_IMAGENAME}:${ROS_DISTRO}-arm64
