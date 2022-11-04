@@ -58,9 +58,9 @@ jobs:
           DOCKER_TAGNAME: ${{ matrix.ros-distro }}-${{ matrix.arch }}
         run: |
           if [[ -d ${DOCKER_TAGNAME%-amd64} ]]; then
-              cd ${DOCKER_TAGNAME%-amd64} && docker buildx build --platform=linux/${{ matrix.arch }} --progress=plain ${{ steps.docker-build-option.outputs.labels }} -t $DOCKER_USERNAME/$DOCKER_IMAGENAME:$DOCKER_TAGNAME .
+              cd ${DOCKER_TAGNAME%-amd64} && docker buildx build  --no-cache --platform=linux/${{ matrix.arch }} --progress=plain ${{ steps.docker-build-option.outputs.labels }} -t $DOCKER_USERNAME/$DOCKER_IMAGENAME:$DOCKER_TAGNAME .
           elif [[ -d ${DOCKER_TAGNAME%-arm64} ]]; then
-              cd ${DOCKER_TAGNAME%-arm64} && docker buildx build --platform=linux/${{ matrix.arch }} --progress=plain ${{ steps.docker-build-option.outputs.labels }} -t $DOCKER_USERNAME/$DOCKER_IMAGENAME:$DOCKER_TAGNAME .
+              cd ${DOCKER_TAGNAME%-arm64} && docker buildx build  --no-cache --platform=linux/${{ matrix.arch }} --progress=plain ${{ steps.docker-build-option.outputs.labels }} -t $DOCKER_USERNAME/$DOCKER_IMAGENAME:$DOCKER_TAGNAME .
           else
               exit 1
           fi
@@ -80,6 +80,12 @@ jobs:
           format: 'template'
           template: '@/contrib/sarif.tpl'
           output: 'trivy-results.sarif'
+
+      - name: Cleanup docker image cache
+        env:
+          DOCKER_TAGNAME: ${{ matrix.ros-distro }}-${{ matrix.arch }}
+        run: |
+            docker rmi $DOCKER_USERNAME/$DOCKER_IMAGENAME:$DOCKER_TAGNAME
 
       - name: Upload Trivy scan results to GitHub Security tab
         uses: github/codeql-action/upload-sarif@v2
