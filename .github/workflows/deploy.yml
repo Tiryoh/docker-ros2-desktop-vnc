@@ -96,7 +96,8 @@ jobs:
           echo ::set-output name=timestamp::$TIMESTAMP
           echo ::set-output name=digest::$(docker inspect --format='{{index .RepoDigests 0}}' $DOCKER_USERNAME/$DOCKER_IMAGENAME:$DOCKER_TAGNAME-$TIMESTAMP)
 
-      - name: Cleanup docker image cache
+      - name: Cleanup docker image cache (amd64)
+        if: contains(matrix.arch, 'amd64') == true
         env:
           DOCKER_TAGNAME: ${{ matrix.ros-distro }}-${{ matrix.arch }}
           TIMESTAMP: ${{ steps.docker.outputs.timestamp }}
@@ -105,6 +106,15 @@ jobs:
           docker rmi ghcr.io/$DOCKER_USERNAME/$DOCKER_IMAGENAME:${DOCKER_TAGNAME%-amd64}-$TIMESTAMP
           docker rmi $DOCKER_USERNAME/$DOCKER_IMAGENAME:$DOCKER_TAGNAME-$TIMESTAMP
           docker rmi $DOCKER_USERNAME/$DOCKER_IMAGENAME:${DOCKER_TAGNAME%-amd64}-$TIMESTAMP
+
+      - name: Cleanup docker image cache (arm64)
+        if: contains(matrix.arch, 'arm64') == true
+        env:
+          DOCKER_TAGNAME: ${{ matrix.ros-distro }}-${{ matrix.arch }}
+          TIMESTAMP: ${{ steps.docker.outputs.timestamp }}
+        run: |
+          docker rmi ghcr.io/$DOCKER_USERNAME/$DOCKER_IMAGENAME:$DOCKER_TAGNAME-$TIMESTAMP
+          docker rmi $DOCKER_USERNAME/$DOCKER_IMAGENAME:$DOCKER_TAGNAME-$TIMESTAMP
 
       - name: Get Current Job Log URL
         id: jobs
