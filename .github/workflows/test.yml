@@ -51,7 +51,7 @@ jobs:
           EOF
           )
           echo $LABELS
-          echo ::set-output name=labels::$LABELS
+          echo "labels=${LABELS}" >> $GITHUB_OUTPUT
 
       - name: Build docker image
         env:
