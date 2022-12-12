@@ -204,7 +204,7 @@ jobs:
           docker manifest push ghcr.io/${DOCKER_USERNAME}/${DOCKER_IMAGENAME}:${ROS_DISTRO}
 
       - name: Publish Docker Image as latest
-        if: contains(matrix.ros-distro, 'foxy') == true
+        if: contains(matrix.ros-distro, 'humble') == true
         env:
           ROS_DISTRO: ${{ matrix.ros-distro }}
         run: |
