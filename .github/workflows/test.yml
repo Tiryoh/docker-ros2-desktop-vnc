@@ -20,7 +20,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        ros-distro: [foxy, galactic, humble, rolling]
+        ros-distro: [foxy, humble, rolling]
         arch: [arm64, amd64]
     runs-on: self-hosted
     timeout-minutes: 120
