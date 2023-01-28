@@ -1,7 +1,7 @@
 # docker-ros2-desktop-vnc
 
-![Docker Automated build](https://img.shields.io/docker/automated/tiryoh/ros2-desktop-vnc)
 [![Publish to Registry](https://github.com/Tiryoh/docker-ros2-desktop-vnc/workflows/Publish%20to%20Registry/badge.svg?branch=master)](https://github.com/Tiryoh/docker-ros2-desktop-vnc/actions?query=workflow%3A%22Publish+to+Registry%22+branch%3Amaster)
+[![Docker Automated build](https://img.shields.io/docker/automated/tiryoh/ros2-desktop-vnc)](https://hub.docker.com/r/tiryoh/ros2-desktop-vnc)
 [![](https://img.shields.io/docker/pulls/tiryoh/ros2-desktop-vnc.svg)](https://hub.docker.com/r/tiryoh/ros2-desktop-vnc)
 
 [![Contributor Covenant](https://img.shields.io/badge/Contributor%20Covenant-2.0-4baaaa.svg)](code_of_conduct.md)
