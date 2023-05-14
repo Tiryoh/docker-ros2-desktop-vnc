@@ -15,6 +15,7 @@
 FROM dorowu/ubuntu-desktop-lxde-vnc:focal
 LABEL maintainer="Tiryoh<tiryoh@gmail.com>"
 
+RUN sed -i.bak -r 's!(deb|deb-src) \S+!\1 http://archive.ubuntu.com/ubuntu/!' /etc/apt/sources.list
 RUN wget -q -O - https://dl.google.com/linux/linux_signing_key.pub | apt-key add - 
 RUN apt-get update -q && \
     apt-get upgrade -yq && \
