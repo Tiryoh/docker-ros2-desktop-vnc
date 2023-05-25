@@ -42,11 +42,14 @@ RUN apt-get update -q && \
     rosdep init && \
     rm -rf /var/lib/apt/lists/*
 
-RUN apt-get update -q && \
-    apt-get install -y \
-    ros-${ROS_DISTRO}-gazebo-ros-pkgs \
-    ros-${ROS_DISTRO}-ros-ign && \
-    rm -rf /var/lib/apt/lists/*
+# Install simulation packages are
+# not ready for amd64 for now (May 24th, 2023)
+# https://repo.ros2.org/status_page/ros_iron_default.html?q=RED
+# RUN apt-get update -q && \
+#     apt-get install -y \
+#     ros-${ROS_DISTRO}-gazebo-ros-pkgs \
+#     ros-${ROS_DISTRO}-ros-gz && \
+#     rm -rf /var/lib/apt/lists/*
 
 RUN gosu ubuntu rosdep update && \
     grep -F "source /opt/ros/${ROS_DISTRO}/setup.bash" /home/ubuntu/.bashrc || echo "source /opt/ros/${ROS_DISTRO}/setup.bash" >> /home/ubuntu/.bashrc && \
