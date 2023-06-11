@@ -80,6 +80,7 @@ jobs:
           format: 'template'
           template: '@/contrib/sarif.tpl'
           output: 'trivy-results.sarif'
+          timeout: '20m'
 
       - name: Cleanup docker image cache
         env:
