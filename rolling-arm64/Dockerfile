@@ -1,4 +1,4 @@
-# Copyright 2020-2022 Tiryoh<tiryoh@gmail.com>
+# Copyright 2020-2023 Tiryoh<tiryoh@gmail.com>
 # 
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -12,8 +12,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-FROM tiryoh/ubuntu-desktop-lxde-vnc:jammy
+FROM atsushisaito/docker-ubuntu-sweb:jammy
 LABEL maintainer="Tiryoh<tiryoh@gmail.com>"
+
+USER root
 
 SHELL ["/bin/bash", "-c"]
 
@@ -22,9 +24,14 @@ RUN apt-get update -q && \
     DEBIAN_FRONTEND=noninteractive apt-get install -yq --no-install-recommends wget curl git build-essential vim sudo lsb-release locales bash-completion tzdata gosu terminator && \
     rm -rf /var/lib/apt/lists/*
 RUN rm /etc/apt/apt.conf.d/docker-clean
-RUN useradd --create-home --home-dir /home/ubuntu --shell /bin/bash --user-group --groups adm,sudo ubuntu && \
-    echo ubuntu:ubuntu | chpasswd && \
-    echo "ubuntu ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers
+
+# Set remote resize function enabled by default
+RUN sed -i "s/UI.initSetting('resize', 'off');/UI.initSetting('resize', 'remote');/g" /usr/lib/novnc/app/ui.js
+
+RUN echo "ubuntu ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers
+
+ENV USER ubuntu
+ENV PASSWD ubuntu
 
 ARG ROS_DISTRO=rolling
 ARG INSTALL_PACKAGE=desktop
@@ -55,4 +62,3 @@ RUN gosu ubuntu rosdep update && \
     grep -F "source /usr/share/colcon_argcomplete/hook/colcon-argcomplete.bash" /home/ubuntu/.bashrc || echo "source /usr/share/colcon_argcomplete/hook/colcon-argcomplete.bash" >> /home/ubuntu/.bashrc && \
     sudo chown ubuntu:ubuntu /home/ubuntu/.bashrc
 
-ENV USER ubuntu
