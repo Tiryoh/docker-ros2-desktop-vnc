@@ -13,8 +13,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-FROM tiryoh/ubuntu-desktop-lxde-vnc:jammy
+FROM atsushisaito/docker-ubuntu-sweb:jammy
 LABEL maintainer="Tiryoh<tiryoh@gmail.com>"
+
+USER root
 
 SHELL ["/bin/bash", "-c"]
 
@@ -23,9 +25,14 @@ RUN apt-get update -q && \
     DEBIAN_FRONTEND=noninteractive apt-get install -yq --no-install-recommends wget curl git build-essential vim sudo lsb-release locales bash-completion tzdata gosu terminator && \
     rm -rf /var/lib/apt/lists/*
 RUN rm /etc/apt/apt.conf.d/docker-clean
-RUN useradd --create-home --home-dir /home/ubuntu --shell /bin/bash --user-group --groups adm,sudo ubuntu && \
-    echo ubuntu:ubuntu | chpasswd && \
-    echo "ubuntu ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers
+
+# Set remote resize function enabled by default
+RUN sed -i "s/UI.initSetting('resize', 'off');/UI.initSetting('resize', 'remote');/g" /usr/lib/novnc/app/ui.js
+
+RUN echo "ubuntu ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers
+
+ENV USER ubuntu
+ENV PASSWD ubuntu
 
 ARG ROS_DISTRO=iron
 ARG INSTALL_PACKAGE=desktop
@@ -42,13 +49,13 @@ RUN apt-get update -q && \
     rosdep init && \
     rm -rf /var/lib/apt/lists/*
 
-# Install simulation package only on amd64
-# Not ready for arm64 for now (May 24th, 2023)
+# Install simulation package
+# not ready for arm64 for now (May 24th, 2023)
 # https://repo.ros2.org/status_page/ros_iron_ujv8.html?q=RED
 # RUN apt-get update -q && \
 #     apt-get install -y \
 #     ros-${ROS_DISTRO}-gazebo-ros-pkgs \
-#     ros-${ROS_DISTRO}-ros-ign && \
+#     ros-${ROS_DISTRO}-ros-gz && \
 #     rm -rf /var/lib/apt/lists/*
 
 RUN gosu ubuntu rosdep update && \
@@ -56,4 +63,3 @@ RUN gosu ubuntu rosdep update && \
     grep -F "source /usr/share/colcon_argcomplete/hook/colcon-argcomplete.bash" /home/ubuntu/.bashrc || echo "source /usr/share/colcon_argcomplete/hook/colcon-argcomplete.bash" >> /home/ubuntu/.bashrc && \
     sudo chown ubuntu:ubuntu /home/ubuntu/.bashrc
 
-ENV USER ubuntu
