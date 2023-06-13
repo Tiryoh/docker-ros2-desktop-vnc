@@ -89,15 +89,32 @@ https://github.com/Tiryoh/docker-ros2-desktop-vnc/wiki
 * https://github.com/atinfinity/nvidia-egl-desktop-ros2
   * Dockerfile to use ROS 2 on Xfce Desktop container with NVIDIA GPU support via VNC/[Selkies](https://github.com/selkies-project/selkies-gstreamer)(Full desktop streaming with WebRTC)
 * https://github.com/fcwu/docker-ubuntu-vnc-desktop
-  * Dockerfile to access Ubuntu Xfce/LXDE/LxQT desktop environment via web VNC interface 
+  * Dockerfile to access Ubuntu Xfce/LXDE/LxQT desktop environment via web VNC interface
+* https://github.com/AtsushiSaito/docker-ubuntu-sweb
+  * Dockerfile to access Ubuntu MATE desktop environment via web VNC interface
 
 ## License
-
-Copyright 2020 Tiryoh\<tiryoh@gmail.com\>
 
 This repository is released under the Apache License 2.0, see [LICENSE](./LICENSE).  
 Unless attributed otherwise, everything in this repository is under the Apache License 2.0.
 
+```
+Copyright 2020-2023 Tiryoh <tiryoh@gmail.com>
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+```
+
 ### Acknowledgements
 
-This Dockerfile is based on [dorowu/ubuntu-desktop-lxde-vnc](https://github.com/fcwu/docker-ubuntu-vnc-desktop), licensed under the [Apache License 2.0](https://github.com/fcwu/docker-ubuntu-vnc-desktop/blob/60f9ae18e71e9fabbfb23f67b212e64ab72c206e/LICENSE).
+* This Dockerfile is based on [atsushisaito/docker-ubuntu-sweb](https://github.com/AtsushiSaito/docker-ubuntu-sweb), licensed under the [Apache License 2.0](https://github.com/AtsushiSaito/docker-ubuntu-sweb/blob/5e7ba8571d2f4d1e4fca0c1527d090c20f7f5e90/LICENSE).
+* This Dockerfile is based on [dorowu/ubuntu-desktop-lxde-vnc](https://github.com/fcwu/docker-ubuntu-vnc-desktop), licensed under the [Apache License 2.0](https://github.com/fcwu/docker-ubuntu-vnc-desktop/blob/60f9ae18e71e9fabbfb23f67b212e64ab72c206e/LICENSE).
