@@ -59,7 +59,13 @@ jobs:
         env:
           DOCKER_TAGNAME: ${{ matrix.ros-distro }}-${{ matrix.arch }}
         run: |
-          cd ${DOCKER_TAGNAME%-amd64} && docker buildx build --no-cache --platform=linux/${{ matrix.arch }} --progress=plain ${{ steps.docker-build-option.outputs.labels }} -t $DOCKER_USERNAME/$DOCKER_IMAGENAME:$DOCKER_TAGNAME .
+          if [[ -d ${DOCKER_TAGNAME%-amd64} ]]; then
+              cd ${DOCKER_TAGNAME%-amd64} && docker buildx build  --no-cache --platform=linux/${{ matrix.arch }} --progress=plain ${{ steps.docker-build-option.outputs.labels }} -t $DOCKER_USERNAME/$DOCKER_IMAGENAME:$DOCKER_TAGNAME .
+          elif [[ -d ${DOCKER_TAGNAME%-arm64} ]]; then
+              cd ${DOCKER_TAGNAME%-arm64} && docker buildx build  --no-cache --platform=linux/${{ matrix.arch }} --progress=plain ${{ steps.docker-build-option.outputs.labels }} -t $DOCKER_USERNAME/$DOCKER_IMAGENAME:$DOCKER_TAGNAME .
+          else
+              exit 1
+          fi
 
       - name: Login to ghcr.io
         uses: docker/login-action@v2

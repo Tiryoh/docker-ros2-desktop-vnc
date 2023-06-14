@@ -13,28 +13,57 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-FROM atsushisaito/docker-ubuntu-sweb:jammy
-LABEL maintainer="Tiryoh<tiryoh@gmail.com>"
+FROM ubuntu:jammy-20230522
 
-USER root
+ARG TARGETPLATFORM
+LABEL maintainer="Tiryoh<tiryoh@gmail.com>"
 
 SHELL ["/bin/bash", "-c"]
 
+# Upgrade OS
 RUN apt-get update -q && \
-    apt-get upgrade -yq && \
-    DEBIAN_FRONTEND=noninteractive apt-get install -yq --no-install-recommends wget curl git build-essential vim sudo lsb-release locales bash-completion tzdata gosu terminator && \
+    DEBIAN_FRONTEND=noninteractive apt-get upgrade -y && \
+    apt-get autoclean && \
+    apt-get autoremove && \
     rm -rf /var/lib/apt/lists/*
-RUN rm /etc/apt/apt.conf.d/docker-clean
+
+# Install Ubuntu Mate desktop
+RUN apt-get update -q && \
+    DEBIAN_FRONTEND=noninteractive apt-get install -y \
+        ubuntu-mate-desktop && \
+    apt-get autoclean && \
+    apt-get autoremove && \
+    rm -rf /var/lib/apt/lists/*
+
+# Add Package
+RUN apt-get update && \
+    DEBIAN_FRONTEND=noninteractive apt-get install -y \
+        tigervnc-standalone-server tigervnc-common \
+        supervisor wget curl gosu git sudo python3-pip tini \
+        build-essential vim sudo lsb-release locales \
+        bash-completion tzdata terminator && \
+    apt-get autoclean && \
+    apt-get autoremove && \
+    rm -rf /var/lib/apt/lists/*
+
+# noVNC and Websockify
+RUN git clone https://github.com/AtsushiSaito/noVNC.git -b add_clipboard_support /usr/lib/novnc
+RUN pip install git+https://github.com/novnc/websockify.git@v0.10.0
+RUN ln -s /usr/lib/novnc/vnc.html /usr/lib/novnc/index.html
 
 # Set remote resize function enabled by default
 RUN sed -i "s/UI.initSetting('resize', 'off');/UI.initSetting('resize', 'remote');/g" /usr/lib/novnc/app/ui.js
 
-RUN echo "ubuntu ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers
+# Disable auto update and crash report
+RUN sed -i 's/Prompt=.*/Prompt=never/' /etc/update-manager/release-upgrades
+RUN sed -i 's/enabled=1/enabled=0/g' /etc/default/apport
 
-ENV USER ubuntu
-ENV PASSWD ubuntu
+# Enable apt-get completion
+RUN rm /etc/apt/apt.conf.d/docker-clean
 
-ARG ROS_DISTRO=iron
+# Install ROS
+ENV ROS_DISTRO iron
+# desktop or ros-base
 ARG INSTALL_PACKAGE=desktop
 
 RUN apt-get update -q && \
@@ -49,17 +78,21 @@ RUN apt-get update -q && \
     rosdep init && \
     rm -rf /var/lib/apt/lists/*
 
+RUN rosdep update
+
 # Install simulation packages are
-# not ready for amd64 for now (May 24th, 2023)
+# not ready for amd64/arm64 for now (May 24th, 2023)
 # https://repo.ros2.org/status_page/ros_iron_default.html?q=RED
-# RUN apt-get update -q && \
+# RUN if [ "$TARGETPLATFORM" = "linux/amd64" ]; then \
+#     apt-get update -q && \
 #     apt-get install -y \
 #     ros-${ROS_DISTRO}-gazebo-ros-pkgs \
 #     ros-${ROS_DISTRO}-ros-gz && \
-#     rm -rf /var/lib/apt/lists/*
+#     rm -rf /var/lib/apt/lists/*; \
+#     fi
 
-RUN gosu ubuntu rosdep update && \
-    grep -F "source /opt/ros/${ROS_DISTRO}/setup.bash" /home/ubuntu/.bashrc || echo "source /opt/ros/${ROS_DISTRO}/setup.bash" >> /home/ubuntu/.bashrc && \
-    grep -F "source /usr/share/colcon_argcomplete/hook/colcon-argcomplete.bash" /home/ubuntu/.bashrc || echo "source /usr/share/colcon_argcomplete/hook/colcon-argcomplete.bash" >> /home/ubuntu/.bashrc && \
-    sudo chown ubuntu:ubuntu /home/ubuntu/.bashrc
+COPY ./entrypoint.sh /
+ENTRYPOINT [ "/bin/bash", "-c", "/entrypoint.sh" ]
 
+ENV USER ubuntu
+ENV PASSWD ubuntu
