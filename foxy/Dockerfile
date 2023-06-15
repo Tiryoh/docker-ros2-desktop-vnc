@@ -64,7 +64,7 @@ RUN sed -i 's/enabled=1/enabled=0/g' /etc/default/apport
 RUN rm /etc/apt/apt.conf.d/docker-clean
 
 # Install ROS
-ENV ROS_DISTRO humble
+ENV ROS_DISTRO foxy
 # desktop or ros-base
 ARG INSTALL_PACKAGE=desktop
 
