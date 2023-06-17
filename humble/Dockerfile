@@ -1,4 +1,4 @@
-# Copyright 2020-2022 Tiryoh<tiryoh@gmail.com>
+# Copyright 2020-2023 Tiryoh<tiryoh@gmail.com>
 # 
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -11,22 +11,61 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+# 
+# This Dockerfile is based on https://github.com/AtsushiSaito/docker-ubuntu-sweb
+# which is released under the Apache-2.0 license.
 
-FROM tiryoh/ubuntu-desktop-lxde-vnc:jammy
+FROM ubuntu:jammy-20230522
+
+ARG TARGETPLATFORM
 LABEL maintainer="Tiryoh<tiryoh@gmail.com>"
 
 SHELL ["/bin/bash", "-c"]
 
+# Upgrade OS
 RUN apt-get update -q && \
-    apt-get upgrade -yq && \
-    DEBIAN_FRONTEND=noninteractive apt-get install -yq --no-install-recommends wget curl git build-essential vim sudo lsb-release locales bash-completion tzdata gosu terminator && \
+    DEBIAN_FRONTEND=noninteractive apt-get upgrade -y && \
+    apt-get autoclean && \
+    apt-get autoremove && \
     rm -rf /var/lib/apt/lists/*
-RUN rm /etc/apt/apt.conf.d/docker-clean
-RUN useradd --create-home --home-dir /home/ubuntu --shell /bin/bash --user-group --groups adm,sudo ubuntu && \
-    echo ubuntu:ubuntu | chpasswd && \
-    echo "ubuntu ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers
 
-ARG ROS_DISTRO=humble
+# Install Ubuntu Mate desktop
+RUN apt-get update -q && \
+    DEBIAN_FRONTEND=noninteractive apt-get install -y \
+        ubuntu-mate-desktop && \
+    apt-get autoclean && \
+    apt-get autoremove && \
+    rm -rf /var/lib/apt/lists/*
+
+# Add Package
+RUN apt-get update && \
+    DEBIAN_FRONTEND=noninteractive apt-get install -y \
+        tigervnc-standalone-server tigervnc-common \
+        supervisor wget curl gosu git sudo python3-pip tini \
+        build-essential vim sudo lsb-release locales \
+        bash-completion tzdata terminator && \
+    apt-get autoclean && \
+    apt-get autoremove && \
+    rm -rf /var/lib/apt/lists/*
+
+# noVNC and Websockify
+RUN git clone https://github.com/AtsushiSaito/noVNC.git -b add_clipboard_support /usr/lib/novnc
+RUN pip install git+https://github.com/novnc/websockify.git@v0.10.0
+RUN ln -s /usr/lib/novnc/vnc.html /usr/lib/novnc/index.html
+
+# Set remote resize function enabled by default
+RUN sed -i "s/UI.initSetting('resize', 'off');/UI.initSetting('resize', 'remote');/g" /usr/lib/novnc/app/ui.js
+
+# Disable auto update and crash report
+RUN sed -i 's/Prompt=.*/Prompt=never/' /etc/update-manager/release-upgrades
+RUN sed -i 's/enabled=1/enabled=0/g' /etc/default/apport
+
+# Enable apt-get completion
+RUN rm /etc/apt/apt.conf.d/docker-clean
+
+# Install ROS
+ENV ROS_DISTRO humble
+# desktop or ros-base
 ARG INSTALL_PACKAGE=desktop
 
 RUN apt-get update -q && \
@@ -41,18 +80,22 @@ RUN apt-get update -q && \
     rosdep init && \
     rm -rf /var/lib/apt/lists/*
 
+RUN rosdep update
+
 # Install simulation package only on amd64
 # Not ready for arm64 for now (July 28th, 2020)
 # https://github.com/Tiryoh/docker-ros2-desktop-vnc/pull/56#issuecomment-1196359860
-RUN apt-get update -q && \
+RUN if [ "$TARGETPLATFORM" = "linux/amd64" ]; then \
+    apt-get update -q && \
     apt-get install -y \
     ros-${ROS_DISTRO}-gazebo-ros-pkgs \
     ros-${ROS_DISTRO}-ros-ign && \
-    rm -rf /var/lib/apt/lists/*
+    rm -rf /var/lib/apt/lists/*; \
+    fi
 
-RUN gosu ubuntu rosdep update && \
-    grep -F "source /opt/ros/${ROS_DISTRO}/setup.bash" /home/ubuntu/.bashrc || echo "source /opt/ros/${ROS_DISTRO}/setup.bash" >> /home/ubuntu/.bashrc && \
-    grep -F "source /usr/share/colcon_argcomplete/hook/colcon-argcomplete.bash" /home/ubuntu/.bashrc || echo "source /usr/share/colcon_argcomplete/hook/colcon-argcomplete.bash" >> /home/ubuntu/.bashrc && \
-    sudo chown ubuntu:ubuntu /home/ubuntu/.bashrc
+COPY ./entrypoint.sh /
+ENTRYPOINT [ "/bin/bash", "-c", "/entrypoint.sh" ]
 
 ENV USER ubuntu
+ENV PASSWD ubuntu
+

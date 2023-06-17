@@ -1,4 +1,4 @@
-# Copyright 2020-2022 Tiryoh<tiryoh@gmail.com>
+# Copyright 2020-2023 Tiryoh<tiryoh@gmail.com>
 # 
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -11,22 +11,61 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+# 
+# This Dockerfile is based on https://github.com/AtsushiSaito/docker-ubuntu-sweb
+# which is released under the Apache-2.0 license.
 
-FROM dorowu/ubuntu-desktop-lxde-vnc:focal
+FROM ubuntu:focal-20230412
+
+ARG TARGETPLATFORM
 LABEL maintainer="Tiryoh<tiryoh@gmail.com>"
 
-RUN sed -i.bak -r 's!(deb|deb-src) \S+!\1 http://archive.ubuntu.com/ubuntu/!' /etc/apt/sources.list
-RUN wget -q -O - https://dl.google.com/linux/linux_signing_key.pub | apt-key add - 
-RUN apt-get update -q && \
-    apt-get upgrade -yq && \
-    DEBIAN_FRONTEND=noninteractive apt-get install -yq --no-install-recommends wget curl git build-essential vim sudo lsb-release locales bash-completion tzdata gosu terminator && \
-    rm -rf /var/lib/apt/lists/*
-RUN rm /etc/apt/apt.conf.d/docker-clean
-RUN useradd --create-home --home-dir /home/ubuntu --shell /bin/bash --user-group --groups adm,sudo ubuntu && \
-    echo ubuntu:ubuntu | chpasswd && \
-    echo "ubuntu ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers
+SHELL ["/bin/bash", "-c"]
 
-ARG ROS_DISTRO=foxy
+# Upgrade OS
+RUN apt-get update -q && \
+    DEBIAN_FRONTEND=noninteractive apt-get upgrade -y && \
+    apt-get autoclean && \
+    apt-get autoremove && \
+    rm -rf /var/lib/apt/lists/*
+
+# Install Ubuntu Mate desktop
+RUN apt-get update -q && \
+    DEBIAN_FRONTEND=noninteractive apt-get install -y \
+        ubuntu-mate-desktop && \
+    apt-get autoclean && \
+    apt-get autoremove && \
+    rm -rf /var/lib/apt/lists/*
+
+# Add Package
+RUN apt-get update && \
+    DEBIAN_FRONTEND=noninteractive apt-get install -y \
+        tigervnc-standalone-server tigervnc-common \
+        supervisor wget curl gosu git sudo python3-pip tini \
+        build-essential vim sudo lsb-release locales \
+        bash-completion tzdata terminator && \
+    apt-get autoclean && \
+    apt-get autoremove && \
+    rm -rf /var/lib/apt/lists/*
+
+# noVNC and Websockify
+RUN git clone https://github.com/AtsushiSaito/noVNC.git -b add_clipboard_support /usr/lib/novnc
+RUN pip install git+https://github.com/novnc/websockify.git@v0.10.0
+RUN ln -s /usr/lib/novnc/vnc.html /usr/lib/novnc/index.html
+
+# Set remote resize function enabled by default
+RUN sed -i "s/UI.initSetting('resize', 'off');/UI.initSetting('resize', 'remote');/g" /usr/lib/novnc/app/ui.js
+
+# Disable auto update and crash report
+RUN sed -i 's/Prompt=.*/Prompt=never/' /etc/update-manager/release-upgrades
+RUN sed -i 's/enabled=1/enabled=0/g' /etc/default/apport
+
+# Enable apt-get completion
+RUN rm /etc/apt/apt.conf.d/docker-clean
+
+# Install ROS
+ENV ROS_DISTRO foxy
+# desktop or ros-base
 ARG INSTALL_PACKAGE=desktop
 
 RUN apt-get update -q && \
@@ -37,18 +76,20 @@ RUN apt-get update -q && \
     apt-get install -y ros-${ROS_DISTRO}-${INSTALL_PACKAGE} \
     python3-argcomplete \
     python3-colcon-common-extensions \
-    python3-rosdep python3-vcstool \
-    ros-${ROS_DISTRO}-gazebo-ros-pkgs && \
+    python3-rosdep python3-vcstool && \
     rosdep init && \
     rm -rf /var/lib/apt/lists/*
 
-RUN gosu ubuntu rosdep update && \
-    grep -F "source /opt/ros/${ROS_DISTRO}/setup.bash" /home/ubuntu/.bashrc || echo "source /opt/ros/${ROS_DISTRO}/setup.bash" >> /home/ubuntu/.bashrc && \
-    grep -F "source /usr/share/colcon_argcomplete/hook/colcon-argcomplete.bash" /home/ubuntu/.bashrc || echo "source /usr/share/colcon_argcomplete/hook/colcon-argcomplete.bash" >> /home/ubuntu/.bashrc && \
-    sudo chown ubuntu:ubuntu /home/ubuntu/.bashrc
+RUN rosdep update
 
-# temporally fix to enable resize uri
-# https://github.com/fcwu/docker-ubuntu-vnc-desktop/pull/247
-RUN sed -i "s#location ~ .*/(api/.*|websockify) {#location ~ .*/(api/.*|websockify|resize) {#" /etc/nginx/sites-enabled/default
+RUN apt-get update -q && \
+    apt-get install -y \
+    ros-${ROS_DISTRO}-gazebo-ros-pkgs \
+    ros-${ROS_DISTRO}-ros-ign-gazebo && \
+    rm -rf /var/lib/apt/lists/*
+
+COPY ./entrypoint.sh /
+ENTRYPOINT [ "/bin/bash", "-c", "/entrypoint.sh" ]
 
 ENV USER ubuntu
+ENV PASSWD ubuntu
