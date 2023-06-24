@@ -24,8 +24,10 @@ https://memoteki.net/archives/2955
 Run the docker container and access with port `6080`.  
 Change the `shm-size` value depending on the situation.
 
+__NOTE__: `--security-opt seccomp=unconfined` flag is required to launch humble image. See https://github.com/Tiryoh/docker-ros2-desktop-vnc/pull/56.
+
 ```
-docker run -p 6080:80 --shm-size=512m tiryoh/ros2-desktop-vnc:humble
+docker run -p 6080:80 --security-opt seccomp=unconfined --shm-size=512m tiryoh/ros2-desktop-vnc:humble
 ```
 
 Browse http://127.0.0.1:6080/.
