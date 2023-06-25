@@ -76,4 +76,9 @@ chown -R $USER:$USER $HOME/.ros
 PASSWORD=
 VNC_PASSWORD=
 
+echo "============================================================================================"
+echo "NOTE: --security-opt seccomp=unconfined flag is required to launch Ubuntu Jammy based image."
+echo -e 'See \e]8;;https://github.com/Tiryoh/docker-ros2-desktop-vnc/pull/56\e\\https://github.com/Tiryoh/docker-ros2-desktop-vnc/pull/56\e]8;;\e\\'
+echo "============================================================================================"
+
 exec /bin/tini -- supervisord -n -c /etc/supervisor/supervisord.conf
