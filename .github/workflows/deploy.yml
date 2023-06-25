@@ -5,7 +5,7 @@ on:
       - master
     paths:
       - "**/Dockerfile"
-      - "**/ros**.sh"
+      - "**/entrypoint.sh"
       - ".github/workflows/deploy.yml"
   schedule:
     - cron: "7 4 * * 0" # Weekly on Sundays at 13:07 (JST)
