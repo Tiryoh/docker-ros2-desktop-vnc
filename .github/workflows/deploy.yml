@@ -22,7 +22,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        ros-distro: [foxy, humble, iron, rolling]
+        ros-distro: [humble, iron, rolling]
         arch: [arm64, amd64]
     # runs-on: self-hosted
     runs-on: ubuntu-latest
