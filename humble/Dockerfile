@@ -63,6 +63,16 @@ RUN sed -i 's/enabled=1/enabled=0/g' /etc/default/apport
 # Enable apt-get completion
 RUN rm /etc/apt/apt.conf.d/docker-clean
 
+# Install Firefox
+RUN DEBIAN_FRONTEND=noninteractive add-apt-repository ppa:mozillateam/ppa -y && \
+    echo 'Package: *' > /etc/apt/preferences.d/mozilla-firefox && \
+    echo 'Pin: release o=LP-PPA-mozillateam' >> /etc/apt/preferences.d/mozilla-firefox && \
+    echo 'Pin-Priority: 1001' >> /etc/apt/preferences.d/mozilla-firefox && \
+    apt-get update -q && \
+    apt-get install -y \
+    firefox && \
+    rm -rf /var/lib/apt/lists/*
+
 # Install ROS
 ENV ROS_DISTRO humble
 # desktop or ros-base
