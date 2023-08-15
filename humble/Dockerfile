@@ -86,7 +86,6 @@ RUN wget -qO - https://gitlab.com/paulcarroty/vscodium-deb-rpm-repo/raw/master/p
     apt-get autoclean && \
     apt-get autoremove && \
     rm -rf /var/lib/apt/lists/*
-RUN codium --install-extension mhutchie.git-graph
 
 # Install ROS
 ENV ROS_DISTRO humble
