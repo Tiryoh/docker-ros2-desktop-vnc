@@ -31,7 +31,6 @@ jobs:
     # MIT License, Copyright (c) 2022 Katsuya Hyodo
     - name: Check space before cleanup
       run: df -h
-
     - name: Clean space
       run: |
           docker images
