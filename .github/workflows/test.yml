@@ -26,11 +26,13 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 120
     steps:
-    # clean space config is based on the following configuration
-    # https://github.com/PINTO0309/onnx2tf/blob/main/.github/workflows/test-models.yml
-    # MIT License, Copyright (c) 2022 Katsuya Hyodo
-    - name: Clean space
+    - name: Check disk space before cleanup
+      run: df -h
+    - name: Clean disk
       run: |
+          # clean space config is based on the following configuration
+          # https://github.com/PINTO0309/onnx2tf/blob/main/.github/workflows/test-models.yml
+          # MIT License, Copyright (c) 2022 Katsuya Hyodo
           docker images
           sudo rm -rf "/opt/*" || true
           sudo rm -rf "/usr/share/dotnet" || true
