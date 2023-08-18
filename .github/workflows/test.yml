@@ -26,8 +26,6 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 120
     steps:
-    - name: Check disk space before cleanup
-      run: df -h
     - name: Clean disk
       run: |
           # clean space config is based on the following configuration
