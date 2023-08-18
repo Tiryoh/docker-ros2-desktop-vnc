@@ -30,7 +30,8 @@ jobs:
     # https://github.com/PINTO0309/onnx2tf/blob/main/.github/workflows/test-models.yml
     # MIT License, Copyright (c) 2022 Katsuya Hyodo
     - name: Check space before cleanup
-      run: df -h
+      run: |
+          df -h
     - name: Clean space
       run: |
           docker images
