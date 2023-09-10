@@ -69,7 +69,7 @@ RUN DEBIAN_FRONTEND=noninteractive add-apt-repository ppa:mozillateam/ppa -y && 
     echo 'Pin: release o=LP-PPA-mozillateam' >> /etc/apt/preferences.d/mozilla-firefox && \
     echo 'Pin-Priority: 1001' >> /etc/apt/preferences.d/mozilla-firefox && \
     apt-get update -q && \
-    apt-get install -y \
+    apt-get install -y --allow-downgrades \
     firefox && \
     apt-get autoclean && \
     apt-get autoremove && \
