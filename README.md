@@ -38,39 +38,54 @@ Browse http://127.0.0.1:6080/.
 
 To build Docker image from this Dockerfile, run the following command.
 
-* dashing
-```
+* dashing (deprecated)
+```sh
 cd dashing && docker build -t tiryoh/ros2-desktop-vnc:dashing .
 ```
 
-* eloquent
-```
+* eloquent (deprecated)
+```sh
 cd eloquent && docker build -t tiryoh/ros2-desktop-vnc:eloquent .
 ```
 
-* foxy
-```
+* foxy (deprecated)
+```sh
 cd foxy && docker build -t tiryoh/ros2-desktop-vnc:foxy .
 ```
 
-* galactic
-```
+* galactic (deprecated)
+```sh
 cd galactic && docker build -t tiryoh/ros2-desktop-vnc:galactic .
 ```
 
 * humble
-```
+```sh
+# using "docker build"
 cd humble && docker build -t tiryoh/ros2-desktop-vnc:humble .
+# using "docker buildx" (amd64)
+cd humble && docker buildx build --platform=linux/amd64 --progress=plain -t tiryoh/ros2-desktop-vnc:humble-amd64 .
+# using "docker buildx" (arm64)
+cd humble && docker buildx build --platform=linux/arm64 --progress=plain -t tiryoh/ros2-desktop-vnc:humble-arm64 .
 ```
 
 * iron
-```
+```sh
+# using "docker build"
 cd iron && docker build -t tiryoh/ros2-desktop-vnc:iron .
+# using "docker buildx" (amd64)
+cd iron && docker buildx build --platform=linux/amd64 --progress=plain -t tiryoh/ros2-desktop-vnc:iron-amd64 .
+# using "docker buildx" (arm64)
+cd iron && docker buildx build --platform=linux/arm64 --progress=plain -t tiryoh/ros2-desktop-vnc:iron-arm64 .
 ```
 
 * rolling
-```
+```sh
+# using "docker build"
 cd rolling && docker build -t tiryoh/ros2-desktop-vnc:rolling .
+# using "docker buildx" (amd64)
+cd rolling && docker buildx build --platform=linux/amd64 --progress=plain -t tiryoh/ros2-desktop-vnc:rolling-amd64 .
+# using "docker buildx" (arm64)
+cd rolling && docker buildx build --platform=linux/arm64 --progress=plain -t tiryoh/ros2-desktop-vnc:rolling-arm64 .
 ```
 
 ## Docker tags on hub.docker.com

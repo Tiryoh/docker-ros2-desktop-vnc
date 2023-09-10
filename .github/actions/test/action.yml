@@ -1,0 +1,99 @@
+name: 'Docker Build Test Action'
+
+description: 'Dockerfile Build and Test GitHub Composite Action'
+
+inputs:
+  ros-distro:
+    description: 'Target ROS distribution'
+    required: true
+  arch:
+    description: 'Platform'
+    required: true
+
+runs:
+  using: 'composite'
+  steps:
+    - name: Free Up GitHub Actions Ubuntu Runner Disk Space
+      uses: hirnidrin/free-disk-space@main
+      # uses: jlumbroso/free-disk-space@main
+      with:
+        # This might remove tools that are actually needed, if set to "true" but frees about 6 GB
+        tool-cache: false
+        # All of these default to true, but feel free to set to "false" if necessary for your workflow
+        android: true
+        dotnet: true
+        haskell: true
+        large-packages: true
+        docker-images: false
+        swap-storage: true
+
+    - uses: docker/setup-qemu-action@v2
+
+    - name: Prepare Docker metadata
+      id: meta
+      uses: docker/metadata-action@v4
+      with:
+        images: |
+          ${{ env.DOCKER_USERNAME }}/${{ env.DOCKER_IMAGENAME }}
+        tags: |
+          type=raw,value=${{ inputs.ros-distro }}-${{ inputs.arch }}-{{date 'YYYYMMDDTHHmm'}}
+          type=raw,value=${{ inputs.ros-distro }}-${{ inputs.arch }}
+        flavor: |
+          latest=false
+          prefix=
+          suffix=
+
+    - name: Parse docker build option
+      id: docker-build-option
+      shell: bash
+      run: |
+        LABELS=$(cat << EOF | grep -E "=." | sed -e "s/org\./--label org./g" | sed -e "s/--label org\(.*\)=\(.*\)$/--label org\1='\2'/g"
+        ${{ steps.meta.outputs.labels }}
+        EOF
+        )
+        echo $LABELS
+        echo "labels=${LABELS}" >> $GITHUB_OUTPUT
+
+    - name: Build docker image
+      env:
+        DOCKER_TAGNAME: ${{ inputs.ros-distro }}-${{ inputs.arch }}
+      shell: bash
+      run: |
+        if [[ -d ${DOCKER_TAGNAME%-amd64} ]]; then
+            cd ${DOCKER_TAGNAME%-amd64} && docker buildx build  --no-cache --platform=linux/${{ inputs.arch }} --progress=plain ${{ steps.docker-build-option.outputs.labels }} -t $DOCKER_USERNAME/$DOCKER_IMAGENAME:$DOCKER_TAGNAME .
+        elif [[ -d ${DOCKER_TAGNAME%-arm64} ]]; then
+            cd ${DOCKER_TAGNAME%-arm64} && docker buildx build  --no-cache --platform=linux/${{ inputs.arch }} --progress=plain ${{ steps.docker-build-option.outputs.labels }} -t $DOCKER_USERNAME/$DOCKER_IMAGENAME:$DOCKER_TAGNAME .
+        else
+            exit 1
+        fi
+
+    - name: List docker images
+      shell: bash
+      run: |
+        mkdir -p build_log
+        docker image ls "$DOCKER_USERNAME/*" | tee ./build_log/docker_images.txt
+
+    - name: Run Trivy vulnerability scanner
+      uses: aquasecurity/trivy-action@master
+      with:
+        image-ref: '${{ env.DOCKER_USERNAME }}/${{ env.DOCKER_IMAGENAME }}:${{ inputs.ros-distro }}-${{ inputs.arch }}'
+        exit-code: '0'
+        vuln-type: 'os,library'
+        severity: 'CRITICAL,HIGH'
+        format: 'template'
+        template: '@/contrib/sarif.tpl'
+        output: 'trivy-results.sarif'
+        timeout: '20m'
+
+    - name: Cleanup docker image cache
+      env:
+        DOCKER_TAGNAME: ${{ inputs.ros-distro }}-${{ inputs.arch }}
+      shell: bash
+      run: |
+          docker rmi $DOCKER_USERNAME/$DOCKER_IMAGENAME:$DOCKER_TAGNAME
+
+    - name: Upload Trivy scan results to GitHub Security tab
+      uses: github/codeql-action/upload-sarif@v2
+      with:
+        sarif_file: 'trivy-results.sarif'
+        wait-for-processing: true

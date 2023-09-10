@@ -63,6 +63,30 @@ RUN sed -i 's/enabled=1/enabled=0/g' /etc/default/apport
 # Enable apt-get completion
 RUN rm /etc/apt/apt.conf.d/docker-clean
 
+# Install Firefox
+RUN DEBIAN_FRONTEND=noninteractive add-apt-repository ppa:mozillateam/ppa -y && \
+    echo 'Package: *' > /etc/apt/preferences.d/mozilla-firefox && \
+    echo 'Pin: release o=LP-PPA-mozillateam' >> /etc/apt/preferences.d/mozilla-firefox && \
+    echo 'Pin-Priority: 1001' >> /etc/apt/preferences.d/mozilla-firefox && \
+    apt-get update -q && \
+    apt-get install -y --allow-downgrades \
+    firefox && \
+    apt-get autoclean && \
+    apt-get autoremove && \
+    rm -rf /var/lib/apt/lists/*
+
+# Install VSCodium
+RUN wget -qO - https://gitlab.com/paulcarroty/vscodium-deb-rpm-repo/raw/master/pub.gpg \
+    | gpg --dearmor \
+    | dd of=/usr/share/keyrings/vscodium-archive-keyring.gpg && \
+    echo 'deb [ signed-by=/usr/share/keyrings/vscodium-archive-keyring.gpg ] https://download.vscodium.com/debs vscodium main' \
+    | tee /etc/apt/sources.list.d/vscodium.list && \
+    apt-get update -q && \
+    apt-get install -y codium && \
+    apt-get autoclean && \
+    apt-get autoremove && \
+    rm -rf /var/lib/apt/lists/*
+
 # Install ROS
 ENV ROS_DISTRO foxy
 # desktop or ros-base

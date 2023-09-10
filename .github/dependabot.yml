@@ -5,3 +5,15 @@ updates:
     directory: "/"
     schedule:
       interval: "daily"
+  - package-ecosystem: "docker"
+    directory: "/humble"
+    schedule:
+      interval: "daily"
+  - package-ecosystem: "docker"
+    directory: "/iron"
+    schedule:
+      interval: "daily"
+  - package-ecosystem: "docker"
+    directory: "/rolling"
+    schedule:
+      interval: "daily"
