@@ -1,6 +1,42 @@
 <a name="unreleased"></a>
 ## [Unreleased]
 
+<a name="v2.0.0"></a>
+## [v2.0.0] - 2023-09-10
+### CI
+- Update set-output to recommended format ([#81](https://github.com/Tiryoh/docker-ros2-desktop-vnc/issues/81))
+- Fix cache clean step ([#76](https://github.com/Tiryoh/docker-ros2-desktop-vnc/issues/76))
+- Optimize for self-hosted runner ([#75](https://github.com/Tiryoh/docker-ros2-desktop-vnc/issues/75))
+- Use self-hosted runner ([#72](https://github.com/Tiryoh/docker-ros2-desktop-vnc/issues/72))
+
+### Chore
+- Use GHA composite action ([#111](https://github.com/Tiryoh/docker-ros2-desktop-vnc/issues/111))
+- bump ubuntu from jammy-20230522 to jammy-20230804 ([#106](https://github.com/Tiryoh/docker-ros2-desktop-vnc/issues/106))
+- Check docker base image version ([#102](https://github.com/Tiryoh/docker-ros2-desktop-vnc/issues/102))
+- Fix Trivy scan timeout ([#93](https://github.com/Tiryoh/docker-ros2-desktop-vnc/issues/93))
+- Add CODE_OF_CONDUCT.md and CONTRIBUTING.md ([#86](https://github.com/Tiryoh/docker-ros2-desktop-vnc/issues/86))
+
+### Documentation
+- Update README ([#101](https://github.com/Tiryoh/docker-ros2-desktop-vnc/issues/101))
+
+### Features
+- Add VSCodium ([#99](https://github.com/Tiryoh/docker-ros2-desktop-vnc/issues/99))
+- Add FireFox ([#98](https://github.com/Tiryoh/docker-ros2-desktop-vnc/issues/98))
+- Add terminator shortcut on desktop ([#95](https://github.com/Tiryoh/docker-ros2-desktop-vnc/issues/95))
+- Use atsushisaito/docker-ubuntu-sweb ([#92](https://github.com/Tiryoh/docker-ros2-desktop-vnc/issues/92))
+- Add ROS 2 Iron Irwini ([#89](https://github.com/Tiryoh/docker-ros2-desktop-vnc/issues/89))
+- Set ROS 2 Humble as the "latest" image ([#83](https://github.com/Tiryoh/docker-ros2-desktop-vnc/issues/83))
+- Drop support for ROS 2 Galactic ([#82](https://github.com/Tiryoh/docker-ros2-desktop-vnc/issues/82))
+- Enable colcon-argcomplete ([#80](https://github.com/Tiryoh/docker-ros2-desktop-vnc/issues/80))
+- Enable bash-completion ([#79](https://github.com/Tiryoh/docker-ros2-desktop-vnc/issues/79))
+- Add terminator ([#73](https://github.com/Tiryoh/docker-ros2-desktop-vnc/issues/73))
+
+### Fix
+- Fix FireFox install error ([#112](https://github.com/Tiryoh/docker-ros2-desktop-vnc/issues/112))
+- Add "--security-opt" ([#94](https://github.com/Tiryoh/docker-ros2-desktop-vnc/issues/94))
+- Stop using mirror server ([#88](https://github.com/Tiryoh/docker-ros2-desktop-vnc/issues/88))
+- Fix platform specifying error ([#67](https://github.com/Tiryoh/docker-ros2-desktop-vnc/issues/67))
+- Remove simulation package from rolling arm64 ([#68](https://github.com/Tiryoh/docker-ros2-desktop-vnc/issues/68))
 
 <a name="v1.4.0"></a>
 ## [v1.4.0] - 2022-09-20
@@ -108,7 +144,8 @@
 - Fix dashing tag image ([#14](https://github.com/Tiryoh/docker-ros2-desktop-vnc/issues/14))
 
 
-[Unreleased]: https://github.com/Tiryoh/docker-ros2-desktop-vnc/compare/v1.4.0...HEAD
+[Unreleased]: https://github.com/Tiryoh/docker-ros2-desktop-vnc/compare/v2.0.0...HEAD
+[v2.0.0]: https://github.com/Tiryoh/docker-ros2-desktop-vnc/compare/v1.4.0...v2.0.0
 [v1.4.0]: https://github.com/Tiryoh/docker-ros2-desktop-vnc/compare/v1.3.0...v1.4.0
 [v1.3.0]: https://github.com/Tiryoh/docker-ros2-desktop-vnc/compare/v1.2.0...v1.3.0
 [v1.2.0]: https://github.com/Tiryoh/docker-ros2-desktop-vnc/compare/v1.1.0...v1.2.0
