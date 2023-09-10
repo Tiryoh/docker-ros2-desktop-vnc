@@ -1,0 +1,107 @@
+name: 'Docker Deploy Action'
+
+description: 'Dockerfile Build and Deploy GitHub Composite Action'
+
+inputs:
+  ros-distro:
+    description: 'Target ROS distribution'
+    required: true
+  latest:
+    description: 'Push as "latest" docker image'
+    default: false
+    required: false
+  gha-job-name:
+    description: 'GitHub Actions Job name'
+    required: true
+  dockerhub-token:
+    description: 'secrets.DOCKERHUB_TOKEN'
+    required: true
+  github-token:
+    description: 'secrets.GITHUB_TOKEN'
+    required: true
+
+
+runs:
+  using: 'composite'
+  steps:
+    - name: Setup QEMU
+      uses: docker/setup-qemu-action@v2
+
+    - name: Setup Docker Buildx
+      id: buildx
+      uses: docker/setup-buildx-action@v2
+
+    - name: Login to docker.io
+      uses: docker/login-action@v2
+      with:
+        username: ${{ env.DOCKER_USERNAME }}
+        password: ${{ inputs.dockerhub-token }}
+
+    - name: Login to ghcr.io
+      uses: docker/login-action@v2
+      with:
+        registry: ghcr.io
+        username: ${{ github.actor }}
+        password: ${{ inputs.github-token }}
+
+    - name: Prepare Docker metadata
+      id: meta
+      uses: docker/metadata-action@v4
+      with:
+        images: |
+          ${{ env.DOCKER_USERNAME }}/${{ env.DOCKER_IMAGENAME }}
+        tags: |
+          type=raw,value=${{ inputs.ros-distro }}
+          type=raw,value=${{ inputs.ros-distro }}-{{date 'YYYYMMDDTHHmm'}}
+        flavor: |
+          latest=${{ inputs.latest }}
+          prefix=
+          suffix=
+
+    - name: Build and Publish
+      id: docker-build
+      uses: docker/build-push-action@v4
+      with:
+        context: ${{ inputs.ros-distro }}
+        platforms: linux/amd64, linux/arm64
+        outputs: type=image,push=true
+        tags: ${{ steps.meta.outputs.tags }}
+        labels: ${{ steps.meta.outputs.labels }}
+
+    - name: Get Current Job Log URL
+      id: jobs
+      uses: Tiryoh/gha-jobid-action@v0
+      with:
+        github_token: ${{ inputs.github-token }}
+        job_name: ${{ inputs.gha-job-name }}
+
+    - name: Update wiki
+      env:
+        DOCKER_TAGNAME: ${{ inputs.ros-distro }}
+        GITHUB_TOKEN: ${{ inputs.github-token }}
+      shell: bash
+      run: |
+        DOCKER_SNAPSHOT=$(echo $DOCKER_METADATA_OUTPUT_JSON | jq .tags | grep ".*-.*T.*" | sed -E "s/.*:(.*-[0-9]*T[0-9]).*/\1/g")
+        echo $DOCKER_SNAPSHOT
+        DOCKER_DIGEST=${{ steps.docker-build.outputs.digest }}
+        echo $DOCKER_DIGEST
+        DOCKER_DIGEST_SHORT=$(echo ${DOCKER_DIGEST} | sed -E 's/.*([0-9a-z]{12})[0-9a-z]{52}$/\1/g')
+        echo $DOCKER_DIGEST_SHORT
+        DOCKER_SNAPSHOT_IMAGE_HISTORY_URL=$(echo "https://hub.docker.com/r/${DOCKER_USERNAME}/${DOCKER_IMAGENAME}/tags?page=1&name=${DOCKER_SNAPSHOT}")
+        git clone --depth=1 https://"${GITHUB_ACTOR}":"${GITHUB_TOKEN}"@github.com/"${GITHUB_REPOSITORY}".wiki.git wiki
+        cd wiki
+        LINE=$(grep -n "add ${DOCKER_TAGNAME} msg after this line" ${DOCKER_TAGNAME}.md | cut -d ":" -f 1)
+        head -n $LINE ${DOCKER_TAGNAME}.md > tmp.md
+        echo "* \`${DOCKER_DIGEST_SHORT}\`" | tee -a tmp.md
+        echo "    * uploaded on $(date --iso-8601="minutes")" | tee -a tmp.md
+        echo "        * ${{ steps.jobs.outputs.html_url }}" | tee -a tmp.md
+        echo "    * snapshot" | tee -a tmp.md
+        echo "        * [\`${DOCKER_SNAPSHOT}\`](${DOCKER_SNAPSHOT_IMAGE_HISTORY_URL})" | tee -a tmp.md
+        tail -n +$(( $LINE+1 )) ${DOCKER_TAGNAME}.md >> tmp.md
+        mv tmp.md ${DOCKER_TAGNAME}.md
+        git config --local user.email "${GIT_CONFIG_EMAIL}"
+        git config --local user.name "${GIT_CONFIG_USER}"
+        git add ${DOCKER_TAGNAME}.md
+        git commit -m "Update ${DOCKER_TAGNAME}.md"
+        git fetch origin && git merge origin/master --no-edit && git push origin master || \
+        git fetch origin && git merge origin/master --no-edit && git push origin master
