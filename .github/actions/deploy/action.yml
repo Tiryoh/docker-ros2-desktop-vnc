@@ -84,7 +84,7 @@ runs:
 
     - name: Get Current Job Log URL
       id: jobs
-      uses: Tiryoh/gha-jobid-action@v0
+      uses: Tiryoh/gha-jobid-action@v1
       with:
         github_token: ${{ inputs.github-token }}
         job_name: ${{ inputs.gha-job-name }}
