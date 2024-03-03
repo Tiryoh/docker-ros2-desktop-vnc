@@ -59,13 +59,7 @@ runs:
         DOCKER_TAGNAME: ${{ inputs.ros-distro }}-${{ inputs.arch }}
       shell: bash
       run: |
-        if [[ -d ${DOCKER_TAGNAME%-amd64} ]]; then
-            cd ${DOCKER_TAGNAME%-amd64} && docker buildx build  --no-cache --platform=linux/${{ inputs.arch }} --progress=plain ${{ steps.docker-build-option.outputs.labels }} -t $DOCKER_USERNAME/$DOCKER_IMAGENAME:$DOCKER_TAGNAME .
-        elif [[ -d ${DOCKER_TAGNAME%-arm64} ]]; then
-            cd ${DOCKER_TAGNAME%-arm64} && docker buildx build  --no-cache --platform=linux/${{ inputs.arch }} --progress=plain ${{ steps.docker-build-option.outputs.labels }} -t $DOCKER_USERNAME/$DOCKER_IMAGENAME:$DOCKER_TAGNAME .
-        else
-            exit 1
-        fi
+        cd ${{ inputs.ros-distro }} && docker buildx build  --no-cache --platform=linux/${{ inputs.arch }} --progress=plain ${{ steps.docker-build-option.outputs.labels }} -t ${{ env.DOCKER_USERNAME }}/${{ env.DOCKER_IMAGENAME }}:$DOCKER_TAGNAME .
 
     - name: List docker images
       shell: bash
