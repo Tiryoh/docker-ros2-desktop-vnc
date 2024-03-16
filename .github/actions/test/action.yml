@@ -27,11 +27,11 @@ runs:
         docker-images: false
         swap-storage: true
 
-    - uses: docker/setup-qemu-action@v2
+    - uses: docker/setup-qemu-action@v3
 
     - name: Prepare Docker metadata
       id: meta
-      uses: docker/metadata-action@v4
+      uses: docker/metadata-action@v5
       with:
         images: |
           ${{ env.DOCKER_USERNAME }}/${{ env.DOCKER_IMAGENAME }}
@@ -87,7 +87,7 @@ runs:
           docker rmi $DOCKER_USERNAME/$DOCKER_IMAGENAME:$DOCKER_TAGNAME
 
     - name: Upload Trivy scan results to GitHub Security tab
-      uses: github/codeql-action/upload-sarif@v2
+      uses: github/codeql-action/upload-sarif@v3
       with:
         sarif_file: 'trivy-results.sarif'
         wait-for-processing: true
