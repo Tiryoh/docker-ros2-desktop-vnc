@@ -343,8 +343,10 @@ PASSWORD=
 VNC_PASSWORD=
 
 echo "============================================================================================"
-echo "NOTE: --security-opt seccomp=unconfined flag is required to launch Ubuntu Jammy based image."
+echo "NOTE 1: --security-opt seccomp=unconfined flag is required to launch Ubuntu Jammy based image."
 echo -e 'See \e]8;;https://github.com/Tiryoh/docker-ros2-desktop-vnc/pull/56\e\\https://github.com/Tiryoh/docker-ros2-desktop-vnc/pull/56\e]8;;\e\\'
+echo "NOTE 2: Before stopping to commit docker container to new docker image, log out first."
+echo -e 'See \e]8;;https://github.com/Tiryoh/docker-ros2-desktop-vnc/issue/131\e\\https://github.com/Tiryoh/docker-ros2-desktop-vnc/issue/131\e]8;;\e\\'
 echo "============================================================================================"
 
 exec /bin/tini -- supervisord -n -c /etc/supervisor/supervisord.conf
