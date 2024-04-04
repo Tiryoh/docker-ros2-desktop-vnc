@@ -15,7 +15,7 @@
 # This Dockerfile is based on https://github.com/AtsushiSaito/docker-ubuntu-sweb
 # which is released under the Apache-2.0 license.
 
-FROM ubuntu:jammy-20240212
+FROM ubuntu:jammy-20240227
 
 ARG TARGETPLATFORM
 LABEL maintainer="Tiryoh<tiryoh@gmail.com>"
@@ -43,7 +43,8 @@ RUN apt-get update && \
         tigervnc-standalone-server tigervnc-common \
         supervisor wget curl gosu git sudo python3-pip tini \
         build-essential vim sudo lsb-release locales \
-        bash-completion tzdata terminator && \
+        bash-completion tzdata terminator \
+        dos2unix && \
     apt-get autoclean && \
     apt-get autoremove && \
     rm -rf /var/lib/apt/lists/*
@@ -118,6 +119,7 @@ RUN if [ "$TARGETPLATFORM" = "linux/amd64" ]; then \
     fi
 
 COPY ./entrypoint.sh /
+RUN dos2unix /entrypoint.sh
 ENTRYPOINT [ "/bin/bash", "-c", "/entrypoint.sh" ]
 
 ENV USER ubuntu
