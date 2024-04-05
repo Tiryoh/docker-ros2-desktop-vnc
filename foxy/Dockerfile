@@ -76,10 +76,9 @@ RUN DEBIAN_FRONTEND=noninteractive add-apt-repository ppa:mozillateam/ppa -y && 
     rm -rf /var/lib/apt/lists/*
 
 # Install VSCodium
-RUN wget -qO - https://gitlab.com/paulcarroty/vscodium-deb-rpm-repo/raw/master/pub.gpg \
-    | gpg --dearmor \
-    | dd of=/usr/share/keyrings/vscodium-archive-keyring.gpg && \
-    echo 'deb [ signed-by=/usr/share/keyrings/vscodium-archive-keyring.gpg ] https://download.vscodium.com/debs vscodium main' \
+RUN wget https://gitlab.com/paulcarroty/vscodium-deb-rpm-repo/raw/master/pub.gpg \
+    -O /usr/share/keyrings/vscodium-archive-keyring.asc && \
+    echo 'deb [ signed-by=/usr/share/keyrings/vscodium-archive-keyring.asc ] https://paulcarroty.gitlab.io/vscodium-deb-rpm-repo/debs vscodium main' \
     | tee /etc/apt/sources.list.d/vscodium.list && \
     apt-get update -q && \
     apt-get install -y codium && \
