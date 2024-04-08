@@ -60,9 +60,6 @@ RUN sed -i "s/UI.initSetting('resize', 'off');/UI.initSetting('resize', 'remote'
 RUN sed -i 's/Prompt=.*/Prompt=never/' /etc/update-manager/release-upgrades
 RUN sed -i 's/enabled=1/enabled=0/g' /etc/default/apport
 
-# Enable apt-get completion
-RUN rm /etc/apt/apt.conf.d/docker-clean
-
 # Install Firefox
 RUN DEBIAN_FRONTEND=noninteractive add-apt-repository ppa:mozillateam/ppa -y && \
     echo 'Package: *' > /etc/apt/preferences.d/mozilla-firefox && \
@@ -110,6 +107,9 @@ RUN apt-get update -q && \
     ros-${ROS_DISTRO}-gazebo-ros-pkgs \
     ros-${ROS_DISTRO}-ros-ign-gazebo && \
     rm -rf /var/lib/apt/lists/*
+
+# Enable apt-get completion after running `apt-get update` in the container
+RUN rm /etc/apt/apt.conf.d/docker-clean
 
 COPY ./entrypoint.sh /
 ENTRYPOINT [ "/bin/bash", "-c", "/entrypoint.sh" ]
