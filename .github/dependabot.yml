@@ -6,14 +6,9 @@ updates:
     schedule:
       interval: "daily"
   - package-ecosystem: "docker"
-    directory: "/humble"
-    schedule:
-      interval: "daily"
-  - package-ecosystem: "docker"
-    directory: "/iron"
-    schedule:
-      interval: "daily"
-  - package-ecosystem: "docker"
-    directory: "/rolling"
+    directories:
+      - "/humble"
+      - "/iron"
+      - "/rolling"
     schedule:
       interval: "daily"
