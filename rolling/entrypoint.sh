@@ -13,7 +13,7 @@ if [ "$USER" != "root" ]; then
     fi
     HOME="/home/$USER"
     echo "$USER:$PASSWORD" | /usr/sbin/chpasswd 2> /dev/null || echo ""
-    cp -r /root/{.config,.gtkrc-2.0,.asoundrc} "$HOME 2>/dev/null"
+    cp -r /root/{.config,.gtkrc-2.0,.asoundrc} "$HOME" 2>/dev/null
     chown -R "$USER:$USER" "$HOME"
     [ -d "/dev/snd" ] && chgrp -R adm /dev/snd
 fi
