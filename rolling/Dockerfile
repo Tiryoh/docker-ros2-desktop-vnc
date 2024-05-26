@@ -1,24 +1,28 @@
 # https://github.com/Tiryoh/docker-ros2-desktop-vnc
-# Copyright 2020-2023 Tiryoh<tiryoh@gmail.com>
-# 
+# Copyright 2020-2024 Tiryoh<tiryoh@gmail.com>
+#
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
-# 
+#
 #     http://www.apache.org/licenses/LICENSE-2.0
-# 
+#
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-# 
+#
 # This Dockerfile is based on https://github.com/AtsushiSaito/docker-ubuntu-sweb
 # which is released under the Apache-2.0 license.
 
 FROM ubuntu:noble-20240429
 
+# Automatic platform ARGs in the global scope
+# https://docs.docker.com/reference/dockerfile/#automatic-platform-args-in-the-global-scope
 ARG TARGETPLATFORM
+ARG TARGETARCH
+
 LABEL maintainer="Tiryoh<tiryoh@gmail.com>"
 
 SHELL ["/bin/bash", "-c"]
@@ -42,7 +46,7 @@ RUN apt-get update -q && \
 RUN apt-get update && \
     DEBIAN_FRONTEND=noninteractive apt-get install -y \
         tigervnc-standalone-server tigervnc-common \
-        supervisor wget curl gosu git sudo python3-pip tini \
+        supervisor wget curl gosu git sudo python3-full python3-pip tini \
         build-essential vim sudo lsb-release locales \
         bash-completion tzdata terminator && \
     apt-get autoclean && \
@@ -51,7 +55,7 @@ RUN apt-get update && \
 
 # noVNC and Websockify
 RUN git clone https://github.com/AtsushiSaito/noVNC.git -b add_clipboard_support /usr/lib/novnc
-RUN pip install git+https://github.com/novnc/websockify.git@v0.10.0
+RUN pip install --break-system-packages git+https://github.com/novnc/websockify.git@v0.10.0
 RUN ln -s /usr/lib/novnc/vnc.html /usr/lib/novnc/index.html
 
 # Set remote resize function enabled by default
@@ -62,10 +66,12 @@ RUN sed -i 's/Prompt=.*/Prompt=never/' /etc/update-manager/release-upgrades
 RUN sed -i 's/enabled=1/enabled=0/g' /etc/default/apport
 
 # Install Firefox
-RUN DEBIAN_FRONTEND=noninteractive add-apt-repository ppa:mozillateam/ppa -y && \
-    echo 'Package: *' > /etc/apt/preferences.d/mozilla-firefox && \
-    echo 'Pin: release o=LP-PPA-mozillateam' >> /etc/apt/preferences.d/mozilla-firefox && \
-    echo 'Pin-Priority: 1001' >> /etc/apt/preferences.d/mozilla-firefox && \
+RUN wget -q https://packages.mozilla.org/apt/repo-signing-key.gpg \
+    -O /etc/apt/keyrings/packages.mozilla.org.asc && \
+    echo "deb [signed-by=/etc/apt/keyrings/packages.mozilla.org.asc] https://packages.mozilla.org/apt mozilla main" \
+    | tee -a /etc/apt/sources.list.d/mozilla-apt.list && \
+    echo 'Package: *Pin: origin packages.mozilla.orgPin-Priority: 900' \
+    | tee /etc/apt/preferences.d/mozilla-apt && \
     apt-get update -q && \
     apt-get install -y \
     firefox && \
