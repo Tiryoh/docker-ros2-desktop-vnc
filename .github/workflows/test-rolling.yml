@@ -16,12 +16,13 @@ env:
   DOCKER_IMAGENAME: ros2-desktop-vnc
 
 jobs:
-  build-amd64:
-    name: build (amd64)
+  build:
     strategy:
       fail-fast: false
-    runs-on: buildjet-2vcpu-ubuntu-2204
-    timeout-minutes: 40
+      matrix:
+        arch: [arm64, amd64]
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
     steps:
       - uses: actions/checkout@v4
         with:
@@ -30,20 +31,4 @@ jobs:
       - uses: ./.github/actions/test
         with:
           ros-distro: rolling
-          arch: amd64
-
-  build-arm64:
-    name: build (arm64)
-    strategy:
-      fail-fast: false
-    runs-on: buildjet-2vcpu-ubuntu-2204-arm
-    timeout-minutes: 40
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-          submodules: true
-      - uses: ./.github/actions/test
-        with:
-          ros-distro: rolling
-          arch: arm64
+          arch: ${{ matrix.arch }}

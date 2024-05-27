@@ -27,7 +27,7 @@ runs:
         docker-images: false
         swap-storage: true
 
-    # - uses: docker/setup-qemu-action@v3
+    - uses: docker/setup-qemu-action@v3
 
     - name: Prepare Docker metadata
       id: meta
