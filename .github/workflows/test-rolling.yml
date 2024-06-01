@@ -6,7 +6,7 @@ on:
     paths:
       - "rolling/**"
       - ".github/workflows/test-rolling.yml"
-      - ".github/actions/test-single-arch/action.yml"
+      - ".github/actions/test/action.yml"
   schedule:
     - cron: "0 2 * * 0" # Weekly on Sundays at 02:00
   workflow_dispatch:
@@ -16,34 +16,19 @@ env:
   DOCKER_IMAGENAME: ros2-desktop-vnc
 
 jobs:
-  build-amd64:
-    name: build (amd64)
+  build:
     strategy:
       fail-fast: false
-    runs-on: ubuntu-latest
-    timeout-minutes: 30
+      matrix:
+        arch: [arm64, amd64]
+    runs-on: ubuntu-24.04
+    timeout-minutes: 120
     steps:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
           submodules: true
-      - uses: ./.github/actions/test-single-arch
+      - uses: ./.github/actions/test
         with:
           ros-distro: rolling
-          arch: amd64
-
-  build-arm64:
-    name: build (arm64)
-    strategy:
-      fail-fast: false
-    runs-on: buildjet-2vcpu-ubuntu-2204-arm
-    timeout-minutes: 30
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-          submodules: true
-      - uses: ./.github/actions/test-single-arch
-        with:
-          ros-distro: rolling
-          arch: arm64
+          arch: ${{ matrix.arch }}
