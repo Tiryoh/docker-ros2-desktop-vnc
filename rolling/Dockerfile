@@ -22,6 +22,7 @@ FROM ubuntu:noble-20240429
 # https://docs.docker.com/reference/dockerfile/#automatic-platform-args-in-the-global-scope
 ARG TARGETPLATFORM
 ARG TARGETARCH
+ARG QEMU_CPU
 
 LABEL maintainer="Tiryoh<tiryoh@gmail.com>"
 

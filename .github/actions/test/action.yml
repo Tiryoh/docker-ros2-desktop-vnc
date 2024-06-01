@@ -59,7 +59,9 @@ runs:
         DOCKER_TAGNAME: ${{ inputs.ros-distro }}-${{ inputs.arch }}
       shell: bash
       run: |
-        cd ${{ inputs.ros-distro }} && docker buildx build  --no-cache --platform=linux/${{ inputs.arch }} --progress=plain ${{ steps.docker-build-option.outputs.labels }} -t ${{ env.DOCKER_USERNAME }}/${{ env.DOCKER_IMAGENAME }}:$DOCKER_TAGNAME .
+        QEMU_OPT=""
+        if [[ "${{ inputs.arch }}" == "arm64" ]]; then QEMU_OPT="cortex-a53"; fi
+        cd ${{ inputs.ros-distro }} && docker buildx build  --no-cache --platform=linux/${{ inputs.arch }} --build-arg QEMU_CPU="$QEMU_OPT" --progress=plain ${{ steps.docker-build-option.outputs.labels }} -t ${{ env.DOCKER_USERNAME }}/${{ env.DOCKER_IMAGENAME }}:$DOCKER_TAGNAME .
 
     - name: List docker images
       shell: bash
