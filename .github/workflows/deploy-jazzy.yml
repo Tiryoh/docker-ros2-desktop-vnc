@@ -1,0 +1,35 @@
+name: Publish to Registry (Jazzy)
+on:
+  push:
+    branches:
+      - master
+    paths:
+      - "jazzy/**"
+      - ".github/workflows/deploy-jazzy.yml"
+      - ".github/actions/deploy/action.yml"
+  schedule:
+    - cron: "7 4 * * 0" # Weekly on Sundays at 13:07 (JST)
+  workflow_dispatch:
+
+env:
+  DOCKER_USERNAME: tiryoh
+  DOCKER_IMAGENAME: ros2-desktop-vnc
+  GIT_CONFIG_USER: Tiryoh@GitHubActions
+  GIT_CONFIG_EMAIL: tiryoh@gmail.com
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          submodules: true
+      - uses: ./.github/actions/deploy
+        with:
+          ros-distro: jazzy
+          latest: false
+          gha-job-name: build-and-deploy
+          dockerhub-token: ${{ secrets.DOCKERHUB_TOKEN }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
