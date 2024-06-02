@@ -22,6 +22,10 @@ FROM ubuntu:noble-20240429
 # https://docs.docker.com/reference/dockerfile/#automatic-platform-args-in-the-global-scope
 ARG TARGETPLATFORM
 ARG TARGETARCH
+
+# The QEMU_CPU option is used to speed up arm64 image builds,
+# amd64 is unaffected as it does not use QEMU.
+# This environment variable is only declared at build time.
 ARG QEMU_CPU
 
 LABEL maintainer="Tiryoh<tiryoh@gmail.com>"
@@ -56,7 +60,7 @@ RUN apt-get update && \
 
 # noVNC and Websockify
 RUN git clone https://github.com/AtsushiSaito/noVNC.git -b add_clipboard_support /usr/lib/novnc
-RUN pip install --break-system-packages git+https://github.com/novnc/websockify.git@v0.10.0
+RUN pip install --no-cache-dir --break-system-packages git+https://github.com/novnc/websockify.git@v0.10.0
 RUN ln -s /usr/lib/novnc/vnc.html /usr/lib/novnc/index.html
 
 # Set remote resize function enabled by default
