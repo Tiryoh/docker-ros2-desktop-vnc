@@ -72,6 +72,9 @@ runs:
           prefix=
           suffix=
 
+    # The QEMU_CPU option is used to speed up arm64 image builds,
+    # amd64 is unaffected as it does not use QEMU.
+    # This environment variable is only declared at build time.
     - name: Build and Publish
       id: docker-build
       uses: docker/build-push-action@v5
@@ -81,6 +84,9 @@ runs:
         outputs: type=image,push=true
         tags: ${{ steps.meta.outputs.tags }}
         labels: ${{ steps.meta.outputs.labels }}
+        build-args: |
+          QEMU_CPU=cortex-a53
+
 
     - name: Get Current Job Log URL
       id: jobs
