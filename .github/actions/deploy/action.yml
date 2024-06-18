@@ -77,7 +77,7 @@ runs:
     # This environment variable is only declared at build time.
     - name: Build and Publish
       id: docker-build
-      uses: docker/build-push-action@v5
+      uses: docker/build-push-action@v6
       with:
         context: ${{ inputs.ros-distro }}
         platforms: linux/amd64, linux/arm64
