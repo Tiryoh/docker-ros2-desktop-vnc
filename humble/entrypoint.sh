@@ -42,6 +42,17 @@ VNCRUN_PATH=$HOME/.vnc/vnc_run.sh
 cat << EOF > $VNCRUN_PATH
 #!/bin/sh
 
+# Workaround for issue when image is created with "docker commit".
+# Thanks to @SaadRana17
+# https://github.com/Tiryoh/docker-ros2-desktop-vnc/issues/131#issuecomment-2184156856
+
+if [ -e /tmp/.X1-lock ]; then
+    rm -f /tmp/.X1-lock
+fi
+if [ -e /tmp/.X11-unix/X1 ]; then
+    rm -f /tmp/.X11-unix/X1
+fi
+
 if [ $(uname -m) = "aarch64" ]; then
     LD_PRELOAD=/lib/aarch64-linux-gnu/libgcc_s.so.1 vncserver :1 -fg -geometry 1920x1080 -depth 24
 else
@@ -345,8 +356,6 @@ VNC_PASSWORD=
 echo "============================================================================================"
 echo "NOTE 1: --security-opt seccomp=unconfined flag is required to launch Ubuntu Jammy based image."
 echo -e 'See \e]8;;https://github.com/Tiryoh/docker-ros2-desktop-vnc/pull/56\e\\https://github.com/Tiryoh/docker-ros2-desktop-vnc/pull/56\e]8;;\e\\'
-echo "NOTE 2: Before stopping to commit docker container to new docker image, log out first."
-echo -e 'See \e]8;;https://github.com/Tiryoh/docker-ros2-desktop-vnc/issue/131\e\\https://github.com/Tiryoh/docker-ros2-desktop-vnc/issue/131\e]8;;\e\\'
 echo "============================================================================================"
 
 exec /bin/tini -- supervisord -n -c /etc/supervisor/supervisord.conf
