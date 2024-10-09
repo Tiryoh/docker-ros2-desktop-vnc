@@ -81,6 +81,9 @@ runs:
         template: '@/contrib/sarif.tpl'
         output: 'trivy-results.sarif'
         timeout: '20m'
+      env:
+        TRIVY_SKIP_DB_UPDATE: true
+        TRIVY_SKIP_JAVA_DB_UPDATE: true
 
     - name: Cleanup docker image cache
       env:
