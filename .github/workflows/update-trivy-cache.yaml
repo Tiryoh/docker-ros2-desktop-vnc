@@ -18,6 +18,13 @@ jobs:
         id: date
         run: echo "date=$(date +'%Y-%m-%d')" >> $GITHUB_OUTPUT
 
+      - name: Login to ghcr.io
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
       - name: Download and extract the vulnerability DB
         run: |
           mkdir -p $GITHUB_WORKSPACE/.cache/trivy/db
