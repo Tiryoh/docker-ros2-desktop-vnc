@@ -114,16 +114,11 @@ RUN apt-get update -q && \
 
 RUN rosdep update
 
-# Install simulation packages are
-# not ready for amd64/arm64 for now (May 24th, 2023)
-# https://repo.ros2.org/status_page/rolling_default.html?q=RED
-# RUN if [ "$TARGETPLATFORM" = "linux/amd64" ]; then \
-#     apt-get update -q && \
-#     apt-get install -y \
-#     ros-${ROS_DISTRO}-gazebo-ros-pkgs \
-#     ros-${ROS_DISTRO}-ros-gz && \
-#     rm -rf /var/lib/apt/lists/*; \
-#     fi
+# Install simulation packages
+RUN apt-get update -q && \
+    apt-get install -y \
+    ros-${ROS_DISTRO}-ros-gz && \
+    rm -rf /var/lib/apt/lists/*
 
 # Enable apt-get completion after running `apt-get update` in the container
 RUN rm /etc/apt/apt.conf.d/docker-clean
