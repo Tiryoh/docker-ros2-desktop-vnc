@@ -13,7 +13,7 @@ Dockerfiles to provide HTML5 VNC interface to access Ubuntu Desktop + ROS2, base
 
 ROS 1 version: https://github.com/Tiryoh/docker-ros-desktop-vnc
 
-![Image from Gyazo](https://i.gyazo.com/5a71a36dc9d6106ef794fbcb86af7e7f.gif)
+![animation](https://github.com/user-attachments/assets/137a5272-f6a3-490f-8bfc-168d082ac949)
 
 There are official ROS 2 Docker images provided by Open Robotics.  
 https://github.com/osrf/docker_images/blob/master/README.md#official-library
@@ -35,7 +35,7 @@ docker run -p 6080:80 --security-opt seccomp=unconfined --shm-size=512m tiryoh/r
 
 Browse http://127.0.0.1:6080/.
 
-![Image from Gyazo](https://i.gyazo.com/ab43ab3f6dc10b5186416499e49d0bbe.jpg)
+![default desktop](https://github.com/user-attachments/assets/29ff479f-de54-4032-995d-d1be244ff4e7)
 
 ## Build
 
