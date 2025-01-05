@@ -64,6 +64,7 @@ runs:
       with:
         images: |
           ${{ env.DOCKER_USERNAME }}/${{ env.DOCKER_IMAGENAME }}
+          ghcr.io/${{ github.repository_owner }}/${{ env.DOCKER_IMAGENAME }}
         tags: |
           type=raw,value=${{ inputs.ros-distro }}
           type=raw,value=${{ inputs.ros-distro }}-{{date 'YYYYMMDDTHHmm'}}
