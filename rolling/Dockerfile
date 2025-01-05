@@ -75,9 +75,11 @@ RUN wget -q https://packages.mozilla.org/apt/repo-signing-key.gpg \
     -O /etc/apt/keyrings/packages.mozilla.org.asc && \
     echo "deb [signed-by=/etc/apt/keyrings/packages.mozilla.org.asc] https://packages.mozilla.org/apt mozilla main" \
     | tee -a /etc/apt/sources.list.d/mozilla-apt.list && \
-    echo 'Package: *Pin: origin packages.mozilla.orgPin-Priority: 900' \
-    | tee /etc/apt/preferences.d/mozilla-apt && \
+    echo "Package: *" | tee /etc/apt/preferences.d/mozilla > /dev/null && \
+    echo "Pin: origin packages.mozilla.org" | tee -a /etc/apt/preferences.d/mozilla > /dev/null && \
+    echo "Pin-Priority: 1000" | tee -a /etc/apt/preferences.d/mozilla > /dev/null && \
     apt-get update -q && \
+    apt-get remove -y firefox && \
     apt-get install -y \
     firefox && \
     apt-get autoclean && \
