@@ -152,5 +152,5 @@ limitations under the License.
 
 ## Star History
 
-[![Star History Chart](https://api.star-history.com/svg?repos=Tiryoh/docker-ros2-desktop-vnc&type=Date)](https://star-history.com/#Tiryoh/docker-ros2-desktop-vnc&Date)
+[![Star History Chart](https://api.star-history.com/svg?repos=Tiryoh/docker-ros2-desktop-vnc,Tiryoh/docker-ros-desktop-vnc&type=Date)](https://star-history.com/#Tiryoh/docker-ros2-desktop-vnc&Tiryoh/docker-ros-desktop-vnc&Date)
 
