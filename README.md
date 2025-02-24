@@ -30,7 +30,7 @@ Change the `shm-size` value depending on the situation.
 __NOTE__: `--security-opt seccomp=unconfined` flag is required to launch humble image. See https://github.com/Tiryoh/docker-ros2-desktop-vnc/pull/56.
 
 ```
-docker run -p 6080:80 --security-opt seccomp=unconfined --shm-size=512m tiryoh/ros2-desktop-vnc:humble
+docker run -p 6080:80 --security-opt seccomp=unconfined --shm-size=512m ghcr.io/tiryoh/ros2-desktop-vnc:humble
 ```
 
 Browse http://127.0.0.1:6080/.
@@ -130,7 +130,7 @@ This repository is released under the Apache License 2.0, see [LICENSE](./LICENS
 Unless attributed otherwise, everything in this repository is under the Apache License 2.0.
 
 ```
-Copyright 2020-2023 Tiryoh <tiryoh@gmail.com>
+Copyright 2020-2025 Tiryoh <tiryoh@gmail.com>
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -153,4 +153,3 @@ limitations under the License.
 ## Star History
 
 [![Star History Chart](https://api.star-history.com/svg?repos=Tiryoh/docker-ros2-desktop-vnc,Tiryoh/docker-ros-desktop-vnc&type=Date)](https://star-history.com/#Tiryoh/docker-ros2-desktop-vnc&Tiryoh/docker-ros-desktop-vnc&Date)
-
