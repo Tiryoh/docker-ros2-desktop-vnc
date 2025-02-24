@@ -20,8 +20,12 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        arch: [arm64, amd64]
-    runs-on: ubuntu-latest
+        include:
+          - arch: amd64
+            runner: ubuntu-latest
+          - arch: arm64
+            runner: ubuntu-22.04-arm64
+    runs-on: ${{ matrix.runner }}
     timeout-minutes: 120
     steps:
       - uses: actions/checkout@v5
