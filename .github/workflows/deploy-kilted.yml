@@ -1,4 +1,4 @@
-name: Publish to Registry (Jazzy)
+name: Publish to Registry (Kilted)
 on:
   push:
     branches:

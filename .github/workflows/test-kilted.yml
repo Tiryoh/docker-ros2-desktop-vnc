@@ -1,4 +1,4 @@
-name: Build and Test (Jazzy)
+name: Build and Test (Kilted)
 on:
   pull_request:
     branches:
