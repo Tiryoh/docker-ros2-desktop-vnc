@@ -5,6 +5,7 @@ group "default" {
     "humble",
     "iron",
     "jazzy",
+    "kilted",
     "rolling"
     ]
 }
@@ -43,6 +44,15 @@ target "jazzy" {
   tags = [
     "${REGISTRY_PREFIX}:jazzy"
     "${REGISTRY_PREFIX}:latest"
+  ]
+  platforms = ["linux/amd64", "linux/arm64"]
+}
+
+target "kilted" {
+  inherits = ["common"]
+  context = "kilted"
+  tags = [
+    "${REGISTRY_PREFIX}:kilted"
   ]
   platforms = ["linux/amd64", "linux/arm64"]
 }
