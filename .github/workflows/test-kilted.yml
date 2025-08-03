@@ -1,6 +1,7 @@
 name: Build and Test (Kilted)
 on:
-  pull_request:
+  # pull_request:
+  push:
     branches:
       - master
     paths:
