@@ -1,6 +1,7 @@
 name: Publish to Registry (Kilted)
 on:
-  push:
+  pull_request:
+  # push:
     branches:
       - master
     paths:
