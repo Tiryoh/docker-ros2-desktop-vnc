@@ -104,10 +104,16 @@ runs:
       run: |
         DOCKER_SNAPSHOT=$(echo $DOCKER_METADATA_OUTPUT_JSON | jq .tags | grep ".*-.*T.*" | sed -E "s/.*:(.*-[0-9]*T[0-9]*).*/\1/g" | head -n 1)
         echo $DOCKER_SNAPSHOT
+        OWNER_TYPE=$(gh api "users/${{ github.repository_owner }}" --jq '.type' 2>/dev/null || echo "User")
+        if [[ "$OWNER_TYPE" == "Organization" ]]; then
+          API_PATH="/orgs/${{ github.repository_owner }}"
+        else
+          API_PATH="/users/${{ github.repository_owner }}"
+        fi
         VERSION_ID=$(gh api \
         -H "Accept: application/vnd.github+json" \
         -H "X-GitHub-Api-Version: 2022-11-28" \
-        /users/${{ github.repository_owner }}/packages/container/${{ env.DOCKER_IMAGENAME }}/versions \
+        ${API_PATH}/packages/container/${{ env.DOCKER_IMAGENAME }}/versions \
         --jq ".[] | select(.metadata.container.tags[] == \"${DOCKER_SNAPSHOT}\") | .id")
         DOCKER_DIGEST=${{ steps.docker-build.outputs.digest }}
         echo $DOCKER_DIGEST
