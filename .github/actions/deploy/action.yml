@@ -102,13 +102,24 @@ runs:
         GITHUB_TOKEN: ${{ inputs.github-token }}
       shell: bash
       run: |
-        DOCKER_SNAPSHOT=$(echo $DOCKER_METADATA_OUTPUT_JSON | jq .tags | grep ".*-.*T.*" | sed -E "s/.*:(.*-[0-9]*T[0-9]).*/\1/g")
+        DOCKER_SNAPSHOT=$(echo $DOCKER_METADATA_OUTPUT_JSON | jq .tags | grep ".*-.*T.*" | sed -E "s/.*:(.*-[0-9]*T[0-9]*).*/\1/g" | head -n 1)
         echo $DOCKER_SNAPSHOT
+        OWNER_TYPE=$(gh api "users/${{ github.repository_owner }}" --jq '.type' 2>/dev/null || echo "User")
+        if [[ "$OWNER_TYPE" == "Organization" ]]; then
+          API_PATH="/orgs/${{ github.repository_owner }}"
+        else
+          API_PATH="/users/${{ github.repository_owner }}"
+        fi
+        VERSION_ID=$(gh api \
+        -H "Accept: application/vnd.github+json" \
+        -H "X-GitHub-Api-Version: 2022-11-28" \
+        ${API_PATH}/packages/container/${{ env.DOCKER_IMAGENAME }}/versions \
+        --jq ".[] | select(.metadata.container.tags[] == \"${DOCKER_SNAPSHOT}\") | .id")
         DOCKER_DIGEST=${{ steps.docker-build.outputs.digest }}
         echo $DOCKER_DIGEST
         DOCKER_DIGEST_SHORT=$(echo ${DOCKER_DIGEST} | sed -E 's/.*([0-9a-z]{12})[0-9a-z]{52}$/\1/g')
         echo $DOCKER_DIGEST_SHORT
-        DOCKER_SNAPSHOT_IMAGE_HISTORY_URL=$(echo "https://hub.docker.com/r/${DOCKER_USERNAME}/${DOCKER_IMAGENAME}/tags?page=1&name=${DOCKER_SNAPSHOT}")
+        DOCKER_SNAPSHOT_IMAGE_HISTORY_URL=$(echo "https://github.com/${{ github.repository }}/pkgs/container/${{ env.DOCKER_IMAGENAME }}/${VERSION_ID}?tag=${DOCKER_SNAPSHOT}")
         git clone --depth=1 https://"${GITHUB_ACTOR}":"${GITHUB_TOKEN}"@github.com/"${GITHUB_REPOSITORY}".wiki.git wiki
         cd wiki
         LINE=$(grep -n "add ${DOCKER_TAGNAME} msg after this line" ${DOCKER_TAGNAME}.md | cut -d ":" -f 1)
