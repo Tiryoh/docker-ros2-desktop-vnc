@@ -100,7 +100,7 @@ RUN apt-get update -q && \
     rosdep init && \
     rm -rf /var/lib/apt/lists/*
 
-RUN rosdep update
+RUN rosdep update --include-eol-distros # https://discourse.ros.org/t/rosdep-and-eol-distros/7640
 
 RUN apt-get update -q && \
     apt-get install -y \
