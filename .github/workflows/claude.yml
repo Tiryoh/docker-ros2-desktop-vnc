@@ -52,9 +52,12 @@ jobs:
 
           # Optional: Allow Claude to run specific commands
           # allowed_tools: "Bash(npm install),Bash(npm run build),Bash(npm run test:*),Bash(npm run lint:*)"
-          allowed_tools: |
+          allowed_tools: >
             Bash(git:*),
-            View,GlobTool,GrepTool,BatchTool,
+            View,
+            GlobTool,
+            GrepTool,
+            BatchTool,
             mcp__github__create_pull_request,
             mcp__github__create_issue,
             mcp__github__get_file_contents,
