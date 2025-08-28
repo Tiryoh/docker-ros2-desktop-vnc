@@ -54,9 +54,9 @@ if [ -e /tmp/.X11-unix/X1 ]; then
 fi
 
 if [ $(uname -m) = "aarch64" ]; then
-    LD_PRELOAD=/lib/aarch64-linux-gnu/libgcc_s.so.1 vncserver :1 -fg -geometry 1920x1080 -depth 24
+    LD_PRELOAD=/lib/aarch64-linux-gnu/libgcc_s.so.1 vncserver :5 -geometry 1920x1080 -depth 24 -fg
 else
-    vncserver :1 -fg -geometry 1920x1080 -depth 24
+    vncserver :5 -geometry 1920x1080 -depth 24 -fg
 fi
 EOF
 
@@ -69,7 +69,7 @@ user=root
 [program:vnc]
 command=gosu '$USER' bash '$VNCRUN_PATH'
 [program:novnc]
-command=gosu '$USER' bash -c "websockify --web=/usr/lib/novnc 80 localhost:5901"
+command=gosu '$USER' bash -c "websockify --web=/usr/lib/novnc 6080 localhost:5905"
 EOF
 
 # colcon

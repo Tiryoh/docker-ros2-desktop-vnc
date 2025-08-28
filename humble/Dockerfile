@@ -15,7 +15,7 @@
 # This Dockerfile is based on https://github.com/AtsushiSaito/docker-ubuntu-sweb
 # which is released under the Apache-2.0 license.
 
-FROM ubuntu:jammy-20250404
+FROM ubuntu:jammy
 
 ARG TARGETPLATFORM
 LABEL maintainer="Tiryoh<tiryoh@gmail.com>"
@@ -50,8 +50,11 @@ RUN apt-get update && \
     rm -rf /var/lib/apt/lists/*
 
 # noVNC and Websockify
-RUN git clone https://github.com/AtsushiSaito/noVNC.git -b add_clipboard_support /usr/lib/novnc
-RUN pip install git+https://github.com/novnc/websockify.git@v0.10.0
+# RUN git clone https://github.com/AtsushiSaito/noVNC.git -b add_clipboard_support /usr/lib/novnc
+COPY ./data/noVNC /usr/lib/novnc
+
+# RUN pip install git+https://github.com/novnc/websockify.git@v0.10.0
+RUN pip install websockify==0.10.0
 RUN ln -s /usr/lib/novnc/vnc.html /usr/lib/novnc/index.html
 
 # Set remote resize function enabled by default
@@ -62,27 +65,27 @@ RUN sed -i 's/Prompt=.*/Prompt=never/' /etc/update-manager/release-upgrades
 RUN sed -i 's/enabled=1/enabled=0/g' /etc/default/apport
 
 # Install Firefox
-RUN DEBIAN_FRONTEND=noninteractive add-apt-repository ppa:mozillateam/ppa -y && \
-    echo 'Package: *' > /etc/apt/preferences.d/mozilla-firefox && \
-    echo 'Pin: release o=LP-PPA-mozillateam' >> /etc/apt/preferences.d/mozilla-firefox && \
-    echo 'Pin-Priority: 1001' >> /etc/apt/preferences.d/mozilla-firefox && \
-    apt-get update -q && \
-    apt-get install -y \
-    firefox && \
-    apt-get autoclean && \
-    apt-get autoremove && \
-    rm -rf /var/lib/apt/lists/*
+# RUN DEBIAN_FRONTEND=noninteractive add-apt-repository ppa:mozillateam/ppa -y && \
+#     echo 'Package: *' > /etc/apt/preferences.d/mozilla-firefox && \
+#     echo 'Pin: release o=LP-PPA-mozillateam' >> /etc/apt/preferences.d/mozilla-firefox && \
+#     echo 'Pin-Priority: 1001' >> /etc/apt/preferences.d/mozilla-firefox && \
+#     apt-get update -q && \
+#     apt-get install -y \
+#     firefox && \
+#     apt-get autoclean && \
+#     apt-get autoremove && \
+#     rm -rf /var/lib/apt/lists/*
 
 # Install VSCodium
-RUN wget https://gitlab.com/paulcarroty/vscodium-deb-rpm-repo/raw/master/pub.gpg \
-    -O /usr/share/keyrings/vscodium-archive-keyring.asc && \
-    echo 'deb [ signed-by=/usr/share/keyrings/vscodium-archive-keyring.asc ] https://paulcarroty.gitlab.io/vscodium-deb-rpm-repo/debs vscodium main' \
-    | tee /etc/apt/sources.list.d/vscodium.list && \
-    apt-get update -q && \
-    apt-get install -y codium && \
-    apt-get autoclean && \
-    apt-get autoremove && \
-    rm -rf /var/lib/apt/lists/*
+# RUN wget https://gitlab.com/paulcarroty/vscodium-deb-rpm-repo/raw/master/pub.gpg \
+#     -O /usr/share/keyrings/vscodium-archive-keyring.asc && \
+#     echo 'deb [ signed-by=/usr/share/keyrings/vscodium-archive-keyring.asc ] https://paulcarroty.gitlab.io/vscodium-deb-rpm-repo/debs vscodium main' \
+#     | tee /etc/apt/sources.list.d/vscodium.list && \
+#     apt-get update -q && \
+#     apt-get install -y codium && \
+#     apt-get autoclean && \
+#     apt-get autoremove && \
+#     rm -rf /var/lib/apt/lists/*
 
 # Install ROS
 ENV ROS_DISTRO humble
