@@ -1,0 +1,8 @@
+# yaml-language-server: $schema=https://storage.googleapis.com/coderabbit_public_assets/schema.v2.json
+
+language: "en-US"
+reviews:
+  auto_review:
+    enabled: false
+    auto_incremental_review: true
+    drafts: false
