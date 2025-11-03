@@ -27,6 +27,32 @@ runs:
         docker-images: false
         swap-storage: true
 
+    - name: Detect CPU arch
+      id: detect-arch
+      shell: bash
+      run: |
+        arch=$(uname -m)
+        case "$arch" in
+          x86_64|amd64) echo "ARCH=amd64" >> $GITHUB_OUTPUT;;
+          aarch64|arm64) echo "ARCH=arm64" >> $GITHUB_OUTPUT;;
+          i386|i686) echo "ARCH=386" >> $GITHUB_OUTPUT;;
+          *) echo "ARCH=$arch" >> $GITHUB_OUTPUT;;
+        esac
+
+    - name: Check arch for backwards compatibility
+      id: check-runner-arch
+      shell: bash
+      run: |
+        echo "Running on architecture: ${{ steps.detect-arch.outputs.ARCH }} (required: ${{ inputs.arch }})"
+        if [[ "${{ steps.detect-arch.outputs.ARCH }}" != "${{ inputs.arch }}" ]]; then
+          echo "::warning::The runner architecture '${{ steps.detect-arch.outputs.ARCH }}' does not match the specified architecture '${{ inputs.arch }}'. Setting up QEMU for cross-building."
+          sudo apt-get update
+          sudo apt-get install -y qemu-user-static
+          # https://github.com/Tiryoh/docker-ros2-desktop-vnc/pull/166#discussion_r1623343874
+          echo "DOCKER_BUILD_OPT=--build-arg QEMU_CPU=cortex-a53" >> $GITHUB_OUTPUT
+        fi
+        echo "DOCKER_BUILD_OPT=''" >> $GITHUB_OUTPUT
+
     - name: Prepare Docker metadata
       id: meta
       uses: docker/metadata-action@v5
@@ -58,6 +84,7 @@ runs:
       shell: bash
       run: |
         cd ${{ inputs.ros-distro }} && docker buildx build  --no-cache --platform=linux/${{ inputs.arch }} --progress=plain ${{ steps.docker-build-option.outputs.labels }} \
+        ${{ steps.check-runner-arch.outputs.DOCKER_BUILD_OPT }} \
         -t ${{ env.DOCKER_USERNAME }}/${{ env.DOCKER_IMAGENAME }}:$DOCKER_TAGNAME .
 
     - name: List docker images
