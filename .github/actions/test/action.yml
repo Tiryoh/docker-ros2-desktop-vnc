@@ -51,7 +51,7 @@ runs:
           # https://github.com/Tiryoh/docker-ros2-desktop-vnc/pull/166#discussion_r1623343874
           echo "DOCKER_BUILD_OPT=--build-arg QEMU_CPU=cortex-a53" >> $GITHUB_OUTPUT
         fi
-        echo "DOCKER_BUILD_OPT=''" >> $GITHUB_OUTPUT
+        echo "DOCKER_BUILD_OPT=" >> $GITHUB_OUTPUT
 
     - name: Prepare Docker metadata
       id: meta
