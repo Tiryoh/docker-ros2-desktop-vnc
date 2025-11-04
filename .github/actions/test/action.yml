@@ -50,8 +50,9 @@ runs:
           sudo apt-get install -y qemu-user-static
           # https://github.com/Tiryoh/docker-ros2-desktop-vnc/pull/166#discussion_r1623343874
           echo "DOCKER_BUILD_OPT=--build-arg QEMU_CPU=cortex-a53" >> $GITHUB_OUTPUT
+        else
+          echo "DOCKER_BUILD_OPT=" >> $GITHUB_OUTPUT
         fi
-        echo "DOCKER_BUILD_OPT=" >> $GITHUB_OUTPUT
 
     - name: Prepare Docker metadata
       id: meta
@@ -100,8 +101,7 @@ runs:
         exit-code: '0'
         vuln-type: 'os,library'
         severity: 'CRITICAL,HIGH'
-        format: 'template'
-        template: '@/contrib/sarif.tpl'
+        format: 'sarif'
         output: 'trivy-results.sarif'
         timeout: '20m'
       env:
