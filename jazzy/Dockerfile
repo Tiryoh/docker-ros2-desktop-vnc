@@ -16,7 +16,7 @@
 # This Dockerfile is based on https://github.com/AtsushiSaito/docker-ubuntu-sweb
 # which is released under the Apache-2.0 license.
 
-FROM ubuntu:noble-20251001
+FROM ubuntu:noble-20251013
 
 # Automatic platform ARGs in the global scope
 # https://docs.docker.com/reference/dockerfile/#automatic-platform-args-in-the-global-scope
