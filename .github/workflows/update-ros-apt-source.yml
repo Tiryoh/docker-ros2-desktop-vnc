@@ -1,0 +1,71 @@
+name: Update ros-apt-source
+
+on:
+  schedule:
+    - cron: "23 2 1 * *" # Monthly on the 1st at 02:23 UTC
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Check latest ros-apt-source version
+        id: version
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          latest=$(gh api repos/ros-infrastructure/ros-apt-source/releases/latest --jq .tag_name)
+          echo "latest=${latest}" >> "$GITHUB_OUTPUT"
+
+          current=$(grep -Rho '^ARG ROS_APT_SOURCE_VERSION=.*' */Dockerfile | head -n1 | cut -d= -f2)
+          echo "current=${current}" >> "$GITHUB_OUTPUT"
+
+          if [ -z "$current" ]; then
+            echo "No ROS_APT_SOURCE_VERSION pins found."
+            exit 0
+          fi
+
+          if [ "$latest" = "$current" ]; then
+            echo "No update needed."
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          echo "changed=true" >> "$GITHUB_OUTPUT"
+
+      - name: Update Dockerfiles
+        if: steps.version.outputs.changed == 'true'
+        env:
+          LATEST_VERSION: ${{ steps.version.outputs.latest }}
+        run: |
+          grep -Rl '^ARG ROS_APT_SOURCE_VERSION=' */Dockerfile | while read -r dockerfile; do
+            sed -i -E "s/^ARG ROS_APT_SOURCE_VERSION=.*/ARG ROS_APT_SOURCE_VERSION=${LATEST_VERSION}/" "$dockerfile"
+          done
+
+      - name: Create pull request
+        if: steps.version.outputs.changed == 'true'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          LATEST_VERSION: ${{ steps.version.outputs.latest }}
+        run: |
+          branch="github-actions/update-ros-apt-source-${LATEST_VERSION}"
+
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git switch -c "$branch"
+          git add '*/Dockerfile'
+          git commit -m "Update ros-apt-source to ${LATEST_VERSION}"
+          git push --force-with-lease origin "$branch"
+
+          gh pr view "$branch" --json url >/dev/null 2>&1 || \
+            gh pr create \
+              --base master \
+              --head "$branch" \
+              --title "Update ros-apt-source to ${LATEST_VERSION}" \
+              --body "Update pinned ros-apt-source version from ${{ steps.version.outputs.current }} to ${LATEST_VERSION}."
