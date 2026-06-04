@@ -6,6 +6,7 @@ group "default" {
     "iron",
     "jazzy",
     "kilted",
+    "lyrical",
     "rolling"
     ]
 }
@@ -42,7 +43,7 @@ target "jazzy" {
   inherits = ["common"]
   context = "jazzy"
   tags = [
-    "${REGISTRY_PREFIX}:jazzy"
+    "${REGISTRY_PREFIX}:jazzy",
     "${REGISTRY_PREFIX}:latest"
   ]
   platforms = ["linux/amd64", "linux/arm64"]
@@ -53,6 +54,15 @@ target "kilted" {
   context = "kilted"
   tags = [
     "${REGISTRY_PREFIX}:kilted"
+  ]
+  platforms = ["linux/amd64", "linux/arm64"]
+}
+
+target "lyrical" {
+  inherits = ["common"]
+  context = "lyrical"
+  tags = [
+    "${REGISTRY_PREFIX}:lyrical"
   ]
   platforms = ["linux/amd64", "linux/arm64"]
 }
