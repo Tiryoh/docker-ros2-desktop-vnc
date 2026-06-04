@@ -363,7 +363,8 @@ echo "Launched docker container."
 echo -e 'Open \e]8;;http://127.0.0.1:6080\e\\http://127.0.0.1:6080\e]8;;\e\\ via web browser.'
 echo ""
 echo "NOTE 1: Default user is \"$USER\", password is \"$PASSWORD\"."
-echo "NOTE 2: --security-opt seccomp=unconfined flag is required to launch Ubuntu Jammy/Noble based image on some environment."
+echo "NOTE 2: --security-opt seccomp=unconfined may be required on older host environments."
+echo "        Add it only if the container fails to start because of the host seccomp profile."
 echo -e 'See \e]8;;https://github.com/Tiryoh/docker-ros2-desktop-vnc/pull/56\e\\https://github.com/Tiryoh/docker-ros2-desktop-vnc/pull/56\e]8;;\e\\'
 echo "============================================================================================"
 
