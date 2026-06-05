@@ -3,6 +3,7 @@
 [![Publish to Registry (Humble)](https://github.com/Tiryoh/docker-ros2-desktop-vnc/actions/workflows/deploy-humble.yml/badge.svg)](https://github.com/Tiryoh/docker-ros2-desktop-vnc/actions/workflows/deploy-humble.yml)
 [![Publish to Registry (Iron)](https://github.com/Tiryoh/docker-ros2-desktop-vnc/actions/workflows/deploy-iron.yml/badge.svg)](https://github.com/Tiryoh/docker-ros2-desktop-vnc/actions/workflows/deploy-iron.yml)
 [![Publish to Registry (Jazzy)](https://github.com/Tiryoh/docker-ros2-desktop-vnc/actions/workflows/deploy-jazzy.yml/badge.svg)](https://github.com/Tiryoh/docker-ros2-desktop-vnc/actions/workflows/deploy-jazzy.yml)
+[![Publish to Registry (Lyrical)](https://github.com/Tiryoh/docker-ros2-desktop-vnc/actions/workflows/deploy-lyrical.yml/badge.svg)](https://github.com/Tiryoh/docker-ros2-desktop-vnc/actions/workflows/deploy-lyrical.yml)
 [![Publish to Registry (Rolling)](https://github.com/Tiryoh/docker-ros2-desktop-vnc/actions/workflows/deploy-rolling.yml/badge.svg)](https://github.com/Tiryoh/docker-ros2-desktop-vnc/actions/workflows/deploy-rolling.yml)
 
 [![Docker Automated build](https://img.shields.io/docker/automated/tiryoh/ros2-desktop-vnc)](https://hub.docker.com/r/tiryoh/ros2-desktop-vnc)
@@ -27,10 +28,8 @@ https://memoteki.net/archives/2955
 Run the docker container and access with port `6080`.  
 Change the `shm-size` value depending on the situation.
 
-__NOTE__: `--security-opt seccomp=unconfined` flag is required to launch humble image. See https://github.com/Tiryoh/docker-ros2-desktop-vnc/pull/56.
-
 ```
-docker run -p 6080:80 --security-opt seccomp=unconfined --shm-size=512m ghcr.io/tiryoh/ros2-desktop-vnc:humble
+docker run -p 6080:80 --shm-size=512m ghcr.io/tiryoh/ros2-desktop-vnc:lyrical
 ```
 
 Browse http://127.0.0.1:6080/.
@@ -91,6 +90,16 @@ cd jazzy && docker buildx build --platform=linux/amd64 --progress=plain -t tiryo
 cd jazzy && docker buildx build --platform=linux/arm64 --progress=plain -t tiryoh/ros2-desktop-vnc:jazzy-arm64 .
 ```
 
+* lyrical
+```sh
+# using "docker build"
+cd lyrical && docker build -t tiryoh/ros2-desktop-vnc:lyrical .
+# using "docker buildx" (amd64)
+cd lyrical && docker buildx build --platform=linux/amd64 --progress=plain -t tiryoh/ros2-desktop-vnc:lyrical-amd64 .
+# using "docker buildx" (arm64)
+cd lyrical && docker buildx build --platform=linux/arm64 --progress=plain -t tiryoh/ros2-desktop-vnc:lyrical-arm64 .
+```
+
 * rolling
 ```sh
 # using "docker build"
@@ -110,6 +119,7 @@ cd rolling && docker buildx build --platform=linux/arm64 --progress=plain -t tir
 * [`humble`](https://hub.docker.com/r/tiryoh/ros2-desktop-vnc/tags?page=1&name=humble), [`latest`](https://hub.docker.com/r/tiryoh/ros2-desktop-vnc/tags?page=1&name=latest) which is based on [`humble/Dockerfile`](./humble/Dockerfile)
 * [`iron`](https://hub.docker.com/r/tiryoh/ros2-desktop-vnc/tags?page=1&name=iron) which is based on [`iron/Dockerfile`](./iron/Dockerfile)
 * [`jazzy`](https://hub.docker.com/r/tiryoh/ros2-desktop-vnc/tags?page=1&name=jazzy) which is based on [`jazzy/Dockerfile`](./jazzy/Dockerfile)
+* [`lyrical`](https://hub.docker.com/r/tiryoh/ros2-desktop-vnc/tags?page=1&name=lyrical) which is based on [`lyrical/Dockerfile`](./lyrical/Dockerfile)
 * [`rolling`](https://hub.docker.com/r/tiryoh/ros2-desktop-vnc/tags?page=1&name=rolling) which is based on [`rolling/Dockerfile`](./rolling/Dockerfile)
 
 Docker tags and build logs are listed on this page.  
@@ -130,7 +140,7 @@ This repository is released under the Apache License 2.0, see [LICENSE](./LICENS
 Unless attributed otherwise, everything in this repository is under the Apache License 2.0.
 
 ```
-Copyright 2020-2025 Tiryoh <tiryoh@gmail.com>
+Copyright 2020-2026 Tiryoh <tiryoh@gmail.com>
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.

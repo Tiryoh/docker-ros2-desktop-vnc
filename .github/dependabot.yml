@@ -13,6 +13,7 @@ updates:
       - "/humble"
       - "/iron"
       - "/jazzy"
+      - "/lyrical"
       - "/rolling"
     schedule:
       interval: "daily"

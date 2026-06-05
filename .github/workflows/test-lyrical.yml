@@ -1,0 +1,38 @@
+name: Build and Test (Lyrical)
+on:
+  pull_request:
+    branches:
+      - master
+    paths:
+      - "lyrical/**"
+      - ".github/workflows/test-lyrical.yml"
+      - ".github/actions/test/action.yml"
+  schedule:
+    - cron: "0 2 * * 0" # Weekly on Sundays at 02:00
+  workflow_dispatch:
+
+env:
+  DOCKER_USERNAME: tiryoh
+  DOCKER_IMAGENAME: ros2-desktop-vnc
+
+jobs:
+  build:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - arch: amd64
+            runner: ubuntu-24.04
+          - arch: arm64
+            runner: ubuntu-24.04-arm
+    runs-on: ${{ matrix.runner }}
+    timeout-minutes: 120
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+          submodules: true
+      - uses: ./.github/actions/test
+        with:
+          ros-distro: lyrical
+          arch: ${{ matrix.arch }}
