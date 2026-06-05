@@ -19,7 +19,7 @@
 # The TigerVNC startup workaround for Ubuntu 26.04 is based on
 # https://github.com/atinfinity/docker-ubuntu-sweb by atinfinity.
 
-FROM ubuntu:resolute-20260404
+FROM ubuntu:resolute-20260421
 
 # Automatic platform ARGs in the global scope
 # https://docs.docker.com/reference/dockerfile/#automatic-platform-args-in-the-global-scope
