@@ -14,12 +14,33 @@ on:
 env:
   DOCKER_USERNAME: tiryoh
   DOCKER_IMAGENAME: ros2-desktop-vnc
+  ROS_DISTRO: foxy
   GIT_CONFIG_USER: Tiryoh@GitHubActions
   GIT_CONFIG_EMAIL: tiryoh@gmail.com
 
 jobs:
-  build-and-deploy:
+  metadata:
     runs-on: ubuntu-latest
+    outputs:
+      snapshot-tag: ${{ steps.tags.outputs.snapshot-tag }}
+    steps:
+      - name: Prepare tags
+        id: tags
+        shell: bash
+        run: |
+          echo "snapshot-tag=${ROS_DISTRO}-$(date -u '+%Y%m%dT%H%M')" >> "$GITHUB_OUTPUT"
+
+  build:
+    needs: metadata
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - arch: amd64
+            runner: ubuntu-24.04
+          - arch: arm64
+            runner: ubuntu-24.04-arm
+    runs-on: ${{ matrix.runner }}
     timeout-minutes: 120
     steps:
       - uses: actions/checkout@v6
@@ -28,8 +49,35 @@ jobs:
           submodules: true
       - uses: ./.github/actions/deploy
         with:
-          ros-distro: foxy
+          ros-distro: ${{ env.ROS_DISTRO }}
           latest: false
+          arch: ${{ matrix.arch }}
+          snapshot-tag: ${{ needs.metadata.outputs.snapshot-tag }}
+          setup-qemu: false
+          update-wiki: false
+          gha-job-name: build (${{ matrix.arch }})
+          dockerhub-token: ${{ secrets.DOCKERHUB_TOKEN }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+
+  manifest:
+    name: build-and-deploy
+    needs:
+      - metadata
+      - build
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+          submodules: true
+      - uses: ./.github/actions/deploy
+        with:
+          ros-distro: ${{ env.ROS_DISTRO }}
+          latest: false
+          snapshot-tag: ${{ needs.metadata.outputs.snapshot-tag }}
+          setup-qemu: false
+          create-manifest: true
           gha-job-name: build-and-deploy
           dockerhub-token: ${{ secrets.DOCKERHUB_TOKEN }}
           github-token: ${{ secrets.GITHUB_TOKEN }}
