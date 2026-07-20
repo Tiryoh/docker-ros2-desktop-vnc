@@ -1,18 +1,5 @@
 # docker-ros2-desktop-vnc
 
-| Distro | CI |
-| --- | --- |
-| Humble | [![Humble](https://github.com/Tiryoh/docker-ros2-desktop-vnc/actions/workflows/deploy-humble.yml/badge.svg)](https://github.com/Tiryoh/docker-ros2-desktop-vnc/actions/workflows/deploy-humble.yml) |
-| Iron | [![Iron](https://github.com/Tiryoh/docker-ros2-desktop-vnc/actions/workflows/deploy-iron.yml/badge.svg)](https://github.com/Tiryoh/docker-ros2-desktop-vnc/actions/workflows/deploy-iron.yml) |
-| Jazzy | [![Jazzy](https://github.com/Tiryoh/docker-ros2-desktop-vnc/actions/workflows/deploy-jazzy.yml/badge.svg)](https://github.com/Tiryoh/docker-ros2-desktop-vnc/actions/workflows/deploy-jazzy.yml) |
-| Lyrical | [![Lyrical](https://github.com/Tiryoh/docker-ros2-desktop-vnc/actions/workflows/deploy-lyrical.yml/badge.svg)](https://github.com/Tiryoh/docker-ros2-desktop-vnc/actions/workflows/deploy-lyrical.yml) |
-| Rolling | [![Rolling](https://github.com/Tiryoh/docker-ros2-desktop-vnc/actions/workflows/deploy-rolling.yml/badge.svg)](https://github.com/Tiryoh/docker-ros2-desktop-vnc/actions/workflows/deploy-rolling.yml) |
-
-| Target | Total | Weekly | Monthly |
-| --- | --- | --- | --- |
-| `tiryoh/ros2-desktop-vnc` | [![Docker Hub pulls](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2FTiryoh%2Foci-registry-stats%2Fmain%2Fdata%2Fshields%2Fdockerhub_ros2_desktop_vnc_total.json)](https://hub.docker.com/r/tiryoh/ros2-desktop-vnc) | [![Docker Hub pulls per week](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2FTiryoh%2Foci-registry-stats%2Fmain%2Fdata%2Fshields%2Fdockerhub_ros2_desktop_vnc_weekly.json)](https://hub.docker.com/r/tiryoh/ros2-desktop-vnc) | [![Docker Hub pulls per month](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2FTiryoh%2Foci-registry-stats%2Fmain%2Fdata%2Fshields%2Fdockerhub_ros2_desktop_vnc_monthly.json)](https://hub.docker.com/r/tiryoh/ros2-desktop-vnc) |
-| `ghcr.io/tiryoh/ros2-desktop-vnc` | [![GHCR downloads](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2FTiryoh%2Foci-registry-stats%2Fmain%2Fdata%2Fshields%2Fghcr_ros2_desktop_vnc_package_total.json)](https://github.com/Tiryoh/docker-ros2-desktop-vnc/pkgs/container/ros2-desktop-vnc) | [![GHCR downloads per week](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2FTiryoh%2Foci-registry-stats%2Fmain%2Fdata%2Fshields%2Fghcr_ros2_desktop_vnc_package_weekly.json)](https://github.com/Tiryoh/docker-ros2-desktop-vnc/pkgs/container/ros2-desktop-vnc) | [![GHCR downloads per month](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2FTiryoh%2Foci-registry-stats%2Fmain%2Fdata%2Fshields%2Fghcr_ros2_desktop_vnc_package_monthly.json)](https://github.com/Tiryoh/docker-ros2-desktop-vnc/pkgs/container/ros2-desktop-vnc) |
-
 Dockerfiles to provide HTML5 VNC interface to access Ubuntu Desktop + ROS2, based on [AtsushiSaito/docker-ubuntu-sweb](https://github.com/AtsushiSaito/docker-ubuntu-sweb)
 
 ROS 1 version: https://github.com/Tiryoh/docker-ros-desktop-vnc
@@ -25,6 +12,19 @@ https://github.com/osrf/docker_images/blob/master/README.md#official-library
 このツールの詳細については以下の記事で紹介しています。  
 The details of these tools are written in Japanese on this page.  
 https://memoteki.net/archives/2955
+
+| Distro | CI |
+| --- | --- |
+| Humble | [![Humble](https://github.com/Tiryoh/docker-ros2-desktop-vnc/actions/workflows/deploy-humble.yml/badge.svg)](https://github.com/Tiryoh/docker-ros2-desktop-vnc/actions/workflows/deploy-humble.yml) |
+| Iron | [![Iron](https://github.com/Tiryoh/docker-ros2-desktop-vnc/actions/workflows/deploy-iron.yml/badge.svg)](https://github.com/Tiryoh/docker-ros2-desktop-vnc/actions/workflows/deploy-iron.yml) |
+| Jazzy | [![Jazzy](https://github.com/Tiryoh/docker-ros2-desktop-vnc/actions/workflows/deploy-jazzy.yml/badge.svg)](https://github.com/Tiryoh/docker-ros2-desktop-vnc/actions/workflows/deploy-jazzy.yml) |
+| Lyrical | [![Lyrical](https://github.com/Tiryoh/docker-ros2-desktop-vnc/actions/workflows/deploy-lyrical.yml/badge.svg)](https://github.com/Tiryoh/docker-ros2-desktop-vnc/actions/workflows/deploy-lyrical.yml) |
+| Rolling | [![Rolling](https://github.com/Tiryoh/docker-ros2-desktop-vnc/actions/workflows/deploy-rolling.yml/badge.svg)](https://github.com/Tiryoh/docker-ros2-desktop-vnc/actions/workflows/deploy-rolling.yml) |
+
+| Target | Total | Weekly | Monthly |
+| --- | --- | --- | --- |
+| `tiryoh/ros2-desktop-vnc` | [![Docker Hub pulls](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2FTiryoh%2Foci-registry-stats%2Fmain%2Fdata%2Fshields%2Fdockerhub_ros2_desktop_vnc_total.json)](https://hub.docker.com/r/tiryoh/ros2-desktop-vnc) | [![Docker Hub pulls per week](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2FTiryoh%2Foci-registry-stats%2Fmain%2Fdata%2Fshields%2Fdockerhub_ros2_desktop_vnc_weekly.json)](https://hub.docker.com/r/tiryoh/ros2-desktop-vnc) | [![Docker Hub pulls per month](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2FTiryoh%2Foci-registry-stats%2Fmain%2Fdata%2Fshields%2Fdockerhub_ros2_desktop_vnc_monthly.json)](https://hub.docker.com/r/tiryoh/ros2-desktop-vnc) |
+| `ghcr.io/tiryoh/ros2-desktop-vnc` | [![GHCR downloads](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2FTiryoh%2Foci-registry-stats%2Fmain%2Fdata%2Fshields%2Fghcr_ros2_desktop_vnc_package_total.json)](https://github.com/Tiryoh/docker-ros2-desktop-vnc/pkgs/container/ros2-desktop-vnc) | [![GHCR downloads per week](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2FTiryoh%2Foci-registry-stats%2Fmain%2Fdata%2Fshields%2Fghcr_ros2_desktop_vnc_package_weekly.json)](https://github.com/Tiryoh/docker-ros2-desktop-vnc/pkgs/container/ros2-desktop-vnc) | [![GHCR downloads per month](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2FTiryoh%2Foci-registry-stats%2Fmain%2Fdata%2Fshields%2Fghcr_ros2_desktop_vnc_package_monthly.json)](https://github.com/Tiryoh/docker-ros2-desktop-vnc/pkgs/container/ros2-desktop-vnc) |
 
 ## Quick Start
 
@@ -42,26 +42,6 @@ Browse http://127.0.0.1:6080/.
 ## Build
 
 To build Docker image from this Dockerfile, run the following command.
-
-* dashing (deprecated)
-```sh
-cd dashing && docker build -t tiryoh/ros2-desktop-vnc:dashing .
-```
-
-* eloquent (deprecated)
-```sh
-cd eloquent && docker build -t tiryoh/ros2-desktop-vnc:eloquent .
-```
-
-* foxy (deprecated)
-```sh
-cd foxy && docker build -t tiryoh/ros2-desktop-vnc:foxy .
-```
-
-* galactic (deprecated)
-```sh
-cd galactic && docker build -t tiryoh/ros2-desktop-vnc:galactic .
-```
 
 * humble
 ```sh
@@ -113,17 +93,48 @@ cd rolling && docker buildx build --platform=linux/amd64 --progress=plain -t tir
 cd rolling && docker buildx build --platform=linux/arm64 --progress=plain -t tiryoh/ros2-desktop-vnc:rolling-arm64 .
 ```
 
+<details>
+<summary>Deprecated distros (dashing, eloquent, foxy, galactic)</summary>
+
+* dashing (deprecated)
+```sh
+cd dashing && docker build -t tiryoh/ros2-desktop-vnc:dashing .
+```
+
+* eloquent (deprecated)
+```sh
+cd eloquent && docker build -t tiryoh/ros2-desktop-vnc:eloquent .
+```
+
+* foxy (deprecated)
+```sh
+cd foxy && docker build -t tiryoh/ros2-desktop-vnc:foxy .
+```
+
+* galactic (deprecated)
+```sh
+cd galactic && docker build -t tiryoh/ros2-desktop-vnc:galactic .
+```
+
+</details>
+
 ## Docker tags on hub.docker.com
 
-* ~~[`dashing`](https://hub.docker.com/r/tiryoh/ros2-desktop-vnc/tags?page=1&name=dashing) which is based on [`dashing/Dockerfile`](./dashing/Dockerfile)~~ deprecated
-* ~~[`eloquent`](https://hub.docker.com/r/tiryoh/ros2-desktop-vnc/tags?page=1&name=eloquent) which is based on [`eloquent/Dockerfile`](./eloquent/Dockerfile)~~ deprecated
 * [`foxy`](https://hub.docker.com/r/tiryoh/ros2-desktop-vnc/tags?page=1&name=foxy) which is based on [`foxy/Dockerfile`](./foxy/Dockerfile)
-* ~~[`galactic`](https://hub.docker.com/r/tiryoh/ros2-desktop-vnc/tags?page=1&name=galactic) which is based on [`galactic/Dockerfile`](./galactic/Dockerfile)~~ deprecated
 * [`humble`](https://hub.docker.com/r/tiryoh/ros2-desktop-vnc/tags?page=1&name=humble), [`latest`](https://hub.docker.com/r/tiryoh/ros2-desktop-vnc/tags?page=1&name=latest) which is based on [`humble/Dockerfile`](./humble/Dockerfile)
 * [`iron`](https://hub.docker.com/r/tiryoh/ros2-desktop-vnc/tags?page=1&name=iron) which is based on [`iron/Dockerfile`](./iron/Dockerfile)
 * [`jazzy`](https://hub.docker.com/r/tiryoh/ros2-desktop-vnc/tags?page=1&name=jazzy) which is based on [`jazzy/Dockerfile`](./jazzy/Dockerfile)
 * [`lyrical`](https://hub.docker.com/r/tiryoh/ros2-desktop-vnc/tags?page=1&name=lyrical) which is based on [`lyrical/Dockerfile`](./lyrical/Dockerfile)
 * [`rolling`](https://hub.docker.com/r/tiryoh/ros2-desktop-vnc/tags?page=1&name=rolling) which is based on [`rolling/Dockerfile`](./rolling/Dockerfile)
+
+<details>
+<summary>Deprecated tags (dashing, eloquent, galactic)</summary>
+
+* ~~[`dashing`](https://hub.docker.com/r/tiryoh/ros2-desktop-vnc/tags?page=1&name=dashing) which is based on [`dashing/Dockerfile`](./dashing/Dockerfile)~~ deprecated
+* ~~[`eloquent`](https://hub.docker.com/r/tiryoh/ros2-desktop-vnc/tags?page=1&name=eloquent) which is based on [`eloquent/Dockerfile`](./eloquent/Dockerfile)~~ deprecated
+* ~~[`galactic`](https://hub.docker.com/r/tiryoh/ros2-desktop-vnc/tags?page=1&name=galactic) which is based on [`galactic/Dockerfile`](./galactic/Dockerfile)~~ deprecated
+
+</details>
 
 Docker tags and build logs are listed on this page.  
 https://github.com/Tiryoh/docker-ros2-desktop-vnc/wiki
