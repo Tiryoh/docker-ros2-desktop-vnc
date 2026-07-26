@@ -34,6 +34,21 @@ docker run -p 6080:80 --shm-size=512m ghcr.io/tiryoh/ros2-desktop-vnc:lyrical
 
 Browse http://127.0.0.1:6080/.
 
+### Troubleshooting GUI applications
+
+Some GUI applications may not work correctly when their system calls are blocked by Docker's default seccomp profile. Reported symptoms include Gazebo displaying a blank window and VSCodium failing to launch. This may also occur with Docker Desktop on macOS.
+
+If you encounter these symptoms, retry with the seccomp profile disabled:
+
+```sh
+docker run -p 6080:80 --security-opt seccomp=unconfined --shm-size=512m ghcr.io/tiryoh/ros2-desktop-vnc:lyrical
+```
+
+> [!WARNING]
+> `seccomp=unconfined` disables Docker's default system call filtering and reduces container isolation. Update Docker Engine or Docker Desktop first, and use this workaround only when necessary with a trusted image.
+
+This workaround was originally introduced for an incompatibility between newer glibc in the container and older Docker seccomp implementations ([#56](https://github.com/Tiryoh/docker-ros2-desktop-vnc/pull/56)), and was later required to resolve GUI blackout issues ([#94](https://github.com/Tiryoh/docker-ros2-desktop-vnc/pull/94)).
+
 ![default desktop](https://github.com/user-attachments/assets/29ff479f-de54-4032-995d-d1be244ff4e7)
 
 ## Build
