@@ -10,6 +10,26 @@ inputs:
     description: 'Push as "latest" docker image'
     default: false
     required: false
+  arch:
+    description: 'Target architecture for single-platform builds'
+    default: ''
+    required: false
+  snapshot-tag:
+    description: 'Snapshot tag prefix shared by single-platform builds'
+    default: ''
+    required: false
+  setup-qemu:
+    description: 'Set up QEMU before building'
+    default: 'true'
+    required: false
+  update-wiki:
+    description: 'Update GitHub wiki after publishing'
+    default: 'true'
+    required: false
+  create-manifest:
+    description: 'Create multi-architecture manifests from single-platform images'
+    default: 'false'
+    required: false
   gha-job-name:
     description: 'GitHub Actions Job name'
     required: true
@@ -25,6 +45,7 @@ runs:
   using: 'composite'
   steps:
     - name: Free Up GitHub Actions Ubuntu Runner Disk Space
+      if: ${{ inputs.create-manifest != 'true' }}
       uses: hirnidrin/free-disk-space@main
       # uses: jlumbroso/free-disk-space@main
       with:
@@ -39,6 +60,7 @@ runs:
         swap-storage: true
 
     - name: Setup QEMU
+      if: ${{ inputs.setup-qemu == 'true' && inputs.create-manifest != 'true' }}
       uses: docker/setup-qemu-action@v3
 
     - name: Setup Docker Buildx
@@ -58,7 +80,22 @@ runs:
         username: ${{ github.actor }}
         password: ${{ inputs.github-token }}
 
+    - name: Prepare image names
+      if: ${{ inputs.arch != '' || inputs.create-manifest == 'true' }}
+      id: images
+      shell: bash
+      run: |
+        echo "docker-image=${DOCKER_USERNAME}/${DOCKER_IMAGENAME}" >> "$GITHUB_OUTPUT"
+        echo "ghcr-image=ghcr.io/${GITHUB_REPOSITORY_OWNER,,}/${DOCKER_IMAGENAME}" >> "$GITHUB_OUTPUT"
+
+    - name: Check single-platform inputs
+      if: ${{ inputs.arch != '' || inputs.create-manifest == 'true' }}
+      shell: bash
+      run: |
+        test -n "${{ inputs.snapshot-tag }}"
+
     - name: Prepare Docker metadata
+      if: ${{ inputs.arch == '' && inputs.create-manifest != 'true' }}
       id: meta
       uses: docker/metadata-action@v5
       with:
@@ -73,10 +110,27 @@ runs:
           prefix=
           suffix=
 
+    - name: Prepare Docker metadata for ${{ inputs.arch }}
+      if: ${{ inputs.arch != '' && inputs.create-manifest != 'true' }}
+      id: meta_arch
+      uses: docker/metadata-action@v5
+      with:
+        images: |
+          ${{ steps.images.outputs.docker-image }}
+          ${{ steps.images.outputs.ghcr-image }}
+        tags: |
+          type=raw,value=${{ inputs.ros-distro }}-${{ inputs.arch }}
+          type=raw,value=${{ inputs.snapshot-tag }}-${{ inputs.arch }}
+        flavor: |
+          latest=false
+          prefix=
+          suffix=
+
     # The QEMU_CPU option is used to speed up arm64 image builds,
     # amd64 is unaffected as it does not use QEMU.
     # This environment variable is only declared at build time.
     - name: Build and Publish
+      if: ${{ inputs.arch == '' && inputs.create-manifest != 'true' }}
       id: docker-build
       uses: docker/build-push-action@v6
       with:
@@ -88,8 +142,60 @@ runs:
         build-args: |
           QEMU_CPU=cortex-a53
 
+    - name: Build and Publish ${{ inputs.arch }}
+      if: ${{ inputs.arch != '' && inputs.create-manifest != 'true' }}
+      uses: docker/build-push-action@v6
+      with:
+        context: ${{ inputs.ros-distro }}
+        platforms: linux/${{ inputs.arch }}
+        outputs: type=image,push=true
+        tags: ${{ steps.meta_arch.outputs.tags }}
+        labels: ${{ steps.meta_arch.outputs.labels }}
+
+    - name: Create Docker Hub manifests
+      if: ${{ inputs.create-manifest == 'true' }}
+      shell: bash
+      run: |
+        docker buildx imagetools create \
+          -t "${{ steps.images.outputs.docker-image }}:${{ inputs.ros-distro }}" \
+          "${{ steps.images.outputs.docker-image }}:${{ inputs.snapshot-tag }}-amd64" \
+          "${{ steps.images.outputs.docker-image }}:${{ inputs.snapshot-tag }}-arm64"
+
+        docker buildx imagetools create \
+          -t "${{ steps.images.outputs.docker-image }}:${{ inputs.snapshot-tag }}" \
+          "${{ steps.images.outputs.docker-image }}:${{ inputs.snapshot-tag }}-amd64" \
+          "${{ steps.images.outputs.docker-image }}:${{ inputs.snapshot-tag }}-arm64"
+
+        if [[ "${{ inputs.latest }}" == "true" ]]; then
+          docker buildx imagetools create \
+            -t "${{ steps.images.outputs.docker-image }}:latest" \
+            "${{ steps.images.outputs.docker-image }}:${{ inputs.snapshot-tag }}-amd64" \
+            "${{ steps.images.outputs.docker-image }}:${{ inputs.snapshot-tag }}-arm64"
+        fi
+
+    - name: Create GHCR manifests
+      if: ${{ inputs.create-manifest == 'true' }}
+      shell: bash
+      run: |
+        docker buildx imagetools create \
+          -t "${{ steps.images.outputs.ghcr-image }}:${{ inputs.ros-distro }}" \
+          "${{ steps.images.outputs.ghcr-image }}:${{ inputs.snapshot-tag }}-amd64" \
+          "${{ steps.images.outputs.ghcr-image }}:${{ inputs.snapshot-tag }}-arm64"
+
+        docker buildx imagetools create \
+          -t "${{ steps.images.outputs.ghcr-image }}:${{ inputs.snapshot-tag }}" \
+          "${{ steps.images.outputs.ghcr-image }}:${{ inputs.snapshot-tag }}-amd64" \
+          "${{ steps.images.outputs.ghcr-image }}:${{ inputs.snapshot-tag }}-arm64"
+
+        if [[ "${{ inputs.latest }}" == "true" ]]; then
+          docker buildx imagetools create \
+            -t "${{ steps.images.outputs.ghcr-image }}:latest" \
+            "${{ steps.images.outputs.ghcr-image }}:${{ inputs.snapshot-tag }}-amd64" \
+            "${{ steps.images.outputs.ghcr-image }}:${{ inputs.snapshot-tag }}-arm64"
+        fi
 
     - name: Get Current Job Log URL
+      if: ${{ inputs.update-wiki == 'true' }}
       id: jobs
       uses: Tiryoh/gha-jobid-action@v1
       with:
@@ -97,6 +203,7 @@ runs:
         job_name: ${{ inputs.gha-job-name }}
 
     - name: Update wiki
+      if: ${{ inputs.update-wiki == 'true' && inputs.create-manifest != 'true' }}
       env:
         DOCKER_TAGNAME: ${{ inputs.ros-distro }}
         GITHUB_TOKEN: ${{ inputs.github-token }}
@@ -116,6 +223,49 @@ runs:
         ${API_PATH}/packages/container/${{ env.DOCKER_IMAGENAME }}/versions \
         --jq ".[] | select(.metadata.container.tags[] == \"${DOCKER_SNAPSHOT}\") | .id")
         DOCKER_DIGEST=${{ steps.docker-build.outputs.digest }}
+        echo $DOCKER_DIGEST
+        DOCKER_DIGEST_SHORT=$(echo ${DOCKER_DIGEST} | sed -E 's/.*([0-9a-z]{12})[0-9a-z]{52}$/\1/g')
+        echo $DOCKER_DIGEST_SHORT
+        DOCKER_SNAPSHOT_IMAGE_HISTORY_URL=$(echo "https://github.com/${{ github.repository }}/pkgs/container/${{ env.DOCKER_IMAGENAME }}/${VERSION_ID}?tag=${DOCKER_SNAPSHOT}")
+        git clone --depth=1 https://"${GITHUB_ACTOR}":"${GITHUB_TOKEN}"@github.com/"${GITHUB_REPOSITORY}".wiki.git wiki
+        cd wiki
+        LINE=$(grep -n "add ${DOCKER_TAGNAME} msg after this line" ${DOCKER_TAGNAME}.md | cut -d ":" -f 1)
+        head -n $LINE ${DOCKER_TAGNAME}.md > tmp.md
+        echo "* \`${DOCKER_DIGEST_SHORT}\`" | tee -a tmp.md
+        echo "    * uploaded on $(date --iso-8601="minutes")" | tee -a tmp.md
+        echo "        * ${{ steps.jobs.outputs.html_url }}" | tee -a tmp.md
+        echo "    * snapshot" | tee -a tmp.md
+        echo "        * [\`${DOCKER_SNAPSHOT}\`](${DOCKER_SNAPSHOT_IMAGE_HISTORY_URL})" | tee -a tmp.md
+        tail -n +$(( $LINE+1 )) ${DOCKER_TAGNAME}.md >> tmp.md
+        mv tmp.md ${DOCKER_TAGNAME}.md
+        git config --local user.email "${GIT_CONFIG_EMAIL}"
+        git config --local user.name "${GIT_CONFIG_USER}"
+        git add ${DOCKER_TAGNAME}.md
+        git commit -m "Update ${DOCKER_TAGNAME}.md"
+        git fetch origin && git merge origin/master --no-edit && git push origin master || \
+        git fetch origin && git merge origin/master --no-edit && git push origin master
+
+    - name: Update wiki for manifest
+      if: ${{ inputs.update-wiki == 'true' && inputs.create-manifest == 'true' }}
+      env:
+        DOCKER_TAGNAME: ${{ inputs.ros-distro }}
+        DOCKER_SNAPSHOT: ${{ inputs.snapshot-tag }}
+        GITHUB_TOKEN: ${{ inputs.github-token }}
+      shell: bash
+      run: |
+        echo "$DOCKER_SNAPSHOT"
+        OWNER_TYPE=$(gh api "users/${{ github.repository_owner }}" --jq '.type' 2>/dev/null || echo "User")
+        if [[ "$OWNER_TYPE" == "Organization" ]]; then
+          API_PATH="/orgs/${{ github.repository_owner }}"
+        else
+          API_PATH="/users/${{ github.repository_owner }}"
+        fi
+        VERSION_ID=$(gh api \
+        -H "Accept: application/vnd.github+json" \
+        -H "X-GitHub-Api-Version: 2022-11-28" \
+        ${API_PATH}/packages/container/${{ env.DOCKER_IMAGENAME }}/versions \
+        --jq ".[] | select(.metadata.container.tags[] == \"${DOCKER_SNAPSHOT}\") | .id")
+        DOCKER_DIGEST=$(docker buildx imagetools inspect "${{ steps.images.outputs.ghcr-image }}:${DOCKER_SNAPSHOT}" --format '{{.Digest}}')
         echo $DOCKER_DIGEST
         DOCKER_DIGEST_SHORT=$(echo ${DOCKER_DIGEST} | sed -E 's/.*([0-9a-z]{12})[0-9a-z]{52}$/\1/g')
         echo $DOCKER_DIGEST_SHORT
