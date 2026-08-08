@@ -28,3 +28,20 @@ docs: Add AGENTS.md with commit message conventions
 Exception: Dependabot may generate `chore(deps): ...` titles. Leave those unchanged unless intentionally changing Dependabot config.
 
 Pull request titles follow the same format as commit subjects.
+
+## GitHub Actions pins
+
+Pin third-party Actions to patch releases:
+
+```yaml
+uses: actions/checkout@v7.0.1
+```
+
+Exception: pin `aquasecurity/trivy-action` to a commit SHA, and keep the version in a comment:
+
+```yaml
+# aquasecurity/trivy-action@v0.36.0
+uses: aquasecurity/trivy-action@ed142fd0673e97e23eac54620cfb913e5ce36c25
+```
+
+Do not use floating refs such as `@v7`, `@main`, `@master`, or `@beta` for third-party Actions.
