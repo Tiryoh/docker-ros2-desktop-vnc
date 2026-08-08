@@ -34,13 +34,6 @@ ci: Pin GitHub Actions to patch versions
 docs: Add AGENTS.md with commit message conventions
 ```
 
-Avoid:
-
-```text
-fix(rolling): work around missing ros-gz metapackage
-chore(ci): add architecture detection
-```
-
 Exception: Dependabot may continue to generate titles such as `chore(deps): ...`. Do not rewrite those unless you are intentionally changing the Dependabot configuration.
 
 Pull request titles should follow the same format as commit subjects.
