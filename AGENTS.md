@@ -45,3 +45,15 @@ uses: aquasecurity/trivy-action@ed142fd0673e97e23eac54620cfb913e5ce36c25
 ```
 
 Do not use floating refs such as `@v7`, `@main`, `@master`, or `@beta` for third-party Actions.
+
+## Dockerfile: ros-apt-source
+
+When a Dockerfile installs ROS via `ros-apt-source`, pin the version with `ARG ROS_APT_SOURCE_VERSION=...`.
+Do not resolve `releases/latest` at image build time.
+
+Updates are handled by `.github/workflows/update-ros-apt-source.yml` (monthly / manual).
+
+## README: seccomp workaround
+
+Do not add `--security-opt seccomp=unconfined` to the default Quick Start `docker run` command.
+Keep the troubleshooting explanation that documents when and why that option may be needed.
