@@ -117,9 +117,15 @@ RUN apt-get update -q && \
 RUN rosdep update
 
 # Install simulation packages
+# The ros-rolling-ros-gz metapackage (and ros-gz-sim-demos) are currently missing
+# from packages.ros.org on noble, while the component packages remain available.
+# See: http://repo.ros2.org/status_page/rolling_default.html
 RUN apt-get update -q && \
     apt-get install -y \
-    ros-${ROS_DISTRO}-ros-gz && \
+    ros-${ROS_DISTRO}-ros-gz-bridge \
+    ros-${ROS_DISTRO}-ros-gz-image \
+    ros-${ROS_DISTRO}-ros-gz-interfaces \
+    ros-${ROS_DISTRO}-ros-gz-sim && \
     rm -rf /var/lib/apt/lists/*
 
 # Enable apt-get completion after running `apt-get update` in the container
