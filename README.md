@@ -54,6 +54,32 @@ This workaround was originally introduced for an incompatibility between newer g
 
 ![default desktop](https://github.com/user-attachments/assets/29ff479f-de54-4032-995d-d1be244ff4e7)
 
+## Used in books
+
+This project is introduced in the following books.
+
+このプロジェクトは、以下の書籍で紹介されています。
+
+* 小倉崇『ROSではじめるロボットプログラミング［改訂版］』工学社, 2021  
+  https://www.kohgakusha.co.jp/books/detail/978-4-7775-2168-5
+* 出村公成, 萩原良信, 升谷保博, タン ジェフリー トゥ チュアン『ROS 2とPythonで作って学ぶAIロボット入門 改訂第2版』講談社, 2025  
+  https://www.kspub.co.jp/book/detail/5386163.html
+
+## Used by
+
+Projects that use this image or adapt its Dockerfiles.
+
+このイメージや Dockerfile を利用しているプロジェクトです。
+
+* [AI-Robot-Book-Humble](https://github.com/AI-Robot-Book-Humble)  
+  Support materials for『ROS 2とPythonで作って学ぶAIロボット入門 改訂第2版』. The Docker environment is based on the Humble image of this repository.
+* [OUXT-Polaris/ros_handson](https://github.com/OUXT-Polaris/ros_handson)  
+  ROS 2 hands-on materials. Uses `tiryoh/ros2-desktop-vnc:humble` as the base image.
+* [unity3d-jp/Unity-ROS-MobileRobot-UI-Tutorial](https://github.com/unity3d-jp/Unity-ROS-MobileRobot-UI-Tutorial)  
+  Unity Japan tutorial for mobile robot UI with Unity and ROS. Uses a Docker environment with web VNC.
+* [Unity-Technologies/Robotics-Nav2-SLAM-Example](https://github.com/Unity-Technologies/Robotics-Nav2-SLAM-Example)  
+  Official Unity Robotics example for Nav2 + SLAM. The ROS 2 Docker environment is adapted from this repository.
+
 ## Build
 
 To build Docker image from this Dockerfile, run the following command.
@@ -156,12 +182,15 @@ https://github.com/Tiryoh/docker-ros2-desktop-vnc/wiki
 
 ## Related projects
 
-* https://github.com/atinfinity/nvidia-egl-desktop-ros2
-  * Dockerfile to use ROS 2 on Xfce Desktop container with NVIDIA GPU support via VNC/[Selkies](https://github.com/selkies-project/selkies-gstreamer)(Full desktop streaming with WebRTC)
-* https://github.com/fcwu/docker-ubuntu-vnc-desktop
-  * Dockerfile to access Ubuntu Xfce/LXDE/LxQT desktop environment via web VNC interface
-* https://github.com/AtsushiSaito/docker-ubuntu-sweb
-  * Dockerfile to access Ubuntu MATE desktop environment via web VNC interface
+* [atinfinity/nvidia-egl-desktop-ros2](https://github.com/atinfinity/nvidia-egl-desktop-ros2)  
+  ROS 2 on a KDE Plasma desktop with NVIDIA GPU support, accessible via VNC or [Selkies](https://github.com/selkies-project/selkies-gstreamer) (full desktop streaming with WebRTC). For users who need GPU acceleration.
+
+### Based on
+
+* [fcwu/docker-ubuntu-vnc-desktop](https://github.com/fcwu/docker-ubuntu-vnc-desktop)  
+  Ubuntu LXDE/LXQt desktop accessible via a web VNC interface (`dorowu/ubuntu-desktop-lxde-vnc`). Earlier Dockerfiles in this repository were based on this project.
+* [AtsushiSaito/docker-ubuntu-sweb](https://github.com/AtsushiSaito/docker-ubuntu-sweb)  
+  Ubuntu MATE desktop accessible via noVNC. The current Dockerfiles are derived from this project, but do not track the latest upstream.
 
 ## License
 
