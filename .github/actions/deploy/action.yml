@@ -38,7 +38,7 @@ runs:
         swap-storage: true
 
     - name: Setup QEMU
-      uses: docker/setup-qemu-action@v4.2.0
+      uses: docker/setup-qemu-action@v4.3.0
 
     - name: Setup Docker Buildx
       id: buildx
