@@ -12,7 +12,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Setup oras
-        uses: oras-project/setup-oras@v2.0.1
+        uses: oras-project/setup-oras@v2.0.2
 
       - name: Get current date
         id: date
