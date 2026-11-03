@@ -108,7 +108,7 @@ ARG INSTALL_PACKAGE=desktop
 # release with this command:
 # ROS_APT_SOURCE_VERSION=$(curl -s https://api.github.com/repos/ros-infrastructure/ros-apt-source/releases/latest | grep -F "tag_name" | awk -F'"' '{print $4}')
 # Pin it here for reproducible Docker builds; update it via GitHub Actions.
-ARG ROS_APT_SOURCE_VERSION=1.2.0
+ARG ROS_APT_SOURCE_VERSION=1.3.0
 
 RUN apt-get update -q && \
     apt-get install -y curl gnupg2 lsb-release && \
