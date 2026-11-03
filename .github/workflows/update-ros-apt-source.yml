@@ -67,5 +67,5 @@ jobs:
             gh pr create \
               --base master \
               --head "$branch" \
-              --title "Update ros-apt-source to ${LATEST_VERSION}" \
+              --title "chore(deps): Update ros-apt-source to ${LATEST_VERSION}" \
               --body "Update pinned ros-apt-source version from ${{ steps.version.outputs.current }} to ${LATEST_VERSION}."
